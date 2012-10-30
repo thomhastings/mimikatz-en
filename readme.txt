@@ -8,8 +8,8 @@ This utility can be used only for study, pentests and other legal actions in acc
 More generally, thank you for respecting the philosophy with which this tool was created, ie not allowing its use for malicious purposes.
 I would in no way responsible for the use made of these technologies.
 
-Binaries, source code, and uses derivatives under license: http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
-Except for the library sekurlsa: http://creativecommons.org/licenses/by/3.0/fr/
+Binaries, source code, and uses derivatives under license: http://creativecommons.org/licenses/by-nc-sa/3.0/en/
+Except for the library sekurlsa: http://creativecommons.org/licenses/by/3.0/en/
 _____________________________________________________
 Benjamin DELPY `gentilkiwi`
 http://blog.gentilkiwi.com/mimikatz
