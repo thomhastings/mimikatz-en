@@ -9,6 +9,7 @@
 #include "mod_process.h"
 #include "mod_secacl.h"
 #include <iostream>
+#include <algorithm>
 
 class mod_mimikatz_handle
 {
@@ -18,4 +19,5 @@ public:
 	static bool list(vector<wstring> * arguments);
 	static bool processStop(vector<wstring> * arguments);
 	static bool tokenImpersonate(vector<wstring> * arguments);
+	static bool nullAcl(vector<wstring> * arguments);
 };

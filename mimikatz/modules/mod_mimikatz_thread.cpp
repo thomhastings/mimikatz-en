@@ -8,11 +8,11 @@
 vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> mod_mimikatz_thread::getMimiKatzCommands()
 {
 	vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> monVector;
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(list,	L"list",	L"Liste les threads"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(suspend,	L"suspend",	L"Suspend un thread actif"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(resume,	L"resume",	L"Reprend un thread suspendu"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(stop,	L"stop",	L"Arrête un thread"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(quit,	L"quit",	L"Envoi un message de fermeture à un thread"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(list,	L"list",	L"Lists the threads"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(suspend,	L"suspend",	L"Suspends a running thread"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(resume,	L"resume",	L"Resumes a suspended thread"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(stop,	L"stop",	L"Stops a thread"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(quit,	L"quit",	L"Sending a close message to a thread"));
 	return monVector;
 }
 
@@ -79,7 +79,7 @@ bool mod_mimikatz_thread::suspend(vector<wstring> * arguments)
 				wcout << L"KO - mod_thread::suspend ; " << mod_system::getWinError();
 		}
 		else
-			wcout << L"argument \'" << *monArgThread << L"\' invalide";
+			wcout << L"argument \'" << *monArgThread << L"\' invalid";
 
 		wcout << endl;
 	}
@@ -95,7 +95,7 @@ bool mod_mimikatz_thread::stop(vector<wstring> * arguments)
 		
 		if(threadId != 0)
 		{
-			wcout << L"thread " << setw(5) << setfill(wchar_t(' ')) << threadId << L"\tarrêt ";
+			wcout << L"thread " << setw(5) << setfill(wchar_t(' ')) << threadId << L"\toff ";
 			
 			if(mod_thread::stop(threadId))
 				wcout << L"OK";
@@ -103,7 +103,7 @@ bool mod_mimikatz_thread::stop(vector<wstring> * arguments)
 				wcout << L"KO - mod_thread::stop ; " << mod_system::getWinError();
 		}
 		else
-			wcout << L"argument \'" << *monArgThread << L"\' invalide";
+			wcout << L"argument \'" << *monArgThread << L"\' invalid";
 
 		wcout << endl;
 	}
@@ -120,7 +120,7 @@ bool mod_mimikatz_thread::quit(vector<wstring> * arguments)
 		
 		if(threadId != 0)
 		{
-			wcout << L"thread " << setw(5) << setfill(wchar_t(' ')) << threadId << L"\tmessage fermeture ";
+			wcout << L"thread " << setw(5) << setfill(wchar_t(' ')) << threadId << L"\tpost closing ";
 			
 			if(mod_thread::quit(threadId))
 				wcout << L"OK";
@@ -128,7 +128,7 @@ bool mod_mimikatz_thread::quit(vector<wstring> * arguments)
 				wcout << L"KO - mod_thread::quit ; " << mod_system::getWinError();
 		}
 		else
-			wcout << L"argument \'" << *monArgThread << L"\' invalide";
+			wcout << L"argument \'" << *monArgThread << L"\' invalid";
 
 		wcout << endl;
 	}

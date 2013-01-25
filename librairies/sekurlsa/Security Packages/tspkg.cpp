@@ -53,7 +53,7 @@ bool searchTSPKGFuncs()
 __kextdll bool __cdecl getTsPkgFunctions(mod_pipe * monPipe, vector<wstring> * mesArguments)
 {
 	wostringstream monStream;
-	monStream << L"** tspkg.dll/lsasrv.dll ** ; Statut recherche : " << (searchTSPKGFuncs() ? L"OK :)" : L"KO :(") << endl << endl <<
+	monStream << L"** tspkg.dll/lsasrv.dll ** ; Research Status : " << (searchTSPKGFuncs() ? L"OK :)" : L"KO :(") << endl << endl <<
 		L"@TSGlobalCredTable  = " << TSGlobalCredTable << endl <<
 		L"@LsaUnprotectMemory = " << SeckPkgFunctionTable->LsaUnprotectMemory << endl;
 	return sendTo(monPipe, monStream.str());

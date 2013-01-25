@@ -11,9 +11,9 @@ vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> mod_mimikatz_terminalserver::getMimiK
 	vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> monVector;
 	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(sessions,		L"sessions"));
 	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(processes,		L"processes"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(multirdp,		L"multirdp",		L"Patch le bureau à distance pour dépasser 2 connexions simultanées"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(viewshadow,		L"viewshadow",		L"Affiche l\'état de la prise de contrôle des sessions RDP"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(modifyshadow,	L"modifyshadow",	L"Modifie l\'état de la prise de contrôle des sessions RDP (DISABLE, INTERACT, INTERACT_NOASK, VIEW, VIEW_NOASK"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(multirdp,		L"multirdp",		L"Remote Desktop patch for more than 2 simultaneous connections"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(viewshadow,		L"viewshadow",		L"Displays the status of the takeover RDP sessions"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(modifyshadow,	L"modifyshadow",	L"Changes the status of the takeover of RDP (DISABLE, INTERACT, INTERACT_NOASK, VIEW, VIEW_NOASK)"));
 	return monVector;
 }
 
@@ -45,7 +45,7 @@ bool mod_mimikatz_terminalserver::processes(vector<wstring> * arguments)
 
 	if(mod_ts::getProcesses(&mesProcess, (arguments->size() ? &arguments->front() : NULL)))
 	{
-		wcout << L"PID\tSessId\tUtilisateur" << endl;
+		wcout << L"PID\tSessId\tUser" << endl;
 		for(vector<mod_ts::KIWI_WTS_PROCESS_INFO>::iterator monProcess = mesProcess.begin(); monProcess != mesProcess.end(); monProcess++)
 		{
 			wcout << 
@@ -110,7 +110,7 @@ bool mod_mimikatz_terminalserver::modifyshadow(vector<wstring> * arguments)
 		if(!strError)
 			listAndOrModifySession(ptrSession, &newState);
 		else
-			wcout << L"Erreur de parsing de l\'argument : " << strState << endl;
+			wcout << L"Error parsing the argument : " << strState << endl;
 	}
 
 	return true;

@@ -9,8 +9,6 @@
 
 #define MSV1_0_PRIMARY_KEY "Primary" 
 extern DWORD MSV1_0_MspAuthenticationPackageId;
-extern PRTL_INIT_STRING RtlInitString;
-extern PRTL_INIT_UNICODESTRING RtlInitUnicodeString;
 
 typedef struct _MSV1_0_PRIMARY_CREDENTIAL { 
 	LSA_UNICODE_STRING LogonDomainName; 

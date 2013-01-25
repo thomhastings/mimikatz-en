@@ -16,6 +16,9 @@
 #include "Security Packages\tspkg.h"
 #include "Security Packages\livessp.h"
 #include "Security Packages\kerberos.h"
+#include "credman.h"
+
+#include "incognito.h"
 
 bool searchLSAFuncs();
 __kextdll bool __cdecl getDescription(wstring * maDescription);

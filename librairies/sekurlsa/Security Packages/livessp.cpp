@@ -33,7 +33,7 @@ __kextdll bool __cdecl getLiveSSP(mod_pipe * monPipe, vector<wstring> * mesArgum
 __kextdll bool __cdecl getLiveSSPFunctions(mod_pipe * monPipe, vector<wstring> * mesArguments)
 {
 	wostringstream monStream;
-	monStream << L"** livessp.dll/lsasrv.dll ** ; Statut recherche : " << (searchLiveGlobalLogonSessionList() ? L"OK :)" : L"KO :(") << endl << endl <<
+	monStream << L"** livessp.dll/lsasrv.dll ** ; Research Status : " << (searchLiveGlobalLogonSessionList() ? L"OK :)" : L"KO :(") << endl << endl <<
 		L"@LiveGlobalLogonSessionList = " << LiveGlobalLogonSessionList << endl <<
 		L"@LsaUnprotectMemory         = " << SeckPkgFunctionTable->LsaUnprotectMemory << endl;
 	return sendTo(monPipe, monStream.str());

@@ -12,24 +12,24 @@ bool mimikatz::initLocalModules()
 	mod_cryptoapi::loadRsaEnh();
 
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"",			L"Standard", mod_mimikatz_standard::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"crypto",		L"Cryptographie et certificats", mod_mimikatz_crypto::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"crypto",		L"Cryptography and Certificates", mod_mimikatz_crypto::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"hash",		L"Hash", mod_mimikatz_hash::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"system",		L"Gestion système", mod_mimikatz_system::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"process",		L"Manipulation des processus", mod_mimikatz_process::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"thread",		L"Manipulation des threads", mod_mimikatz_thread::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"service",		L"Manipulation des services", mod_mimikatz_service::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"privilege",	L"Manipulation des privilèges", mod_mimikatz_privilege::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"handle",		L"Manipulation des handles", mod_mimikatz_handle::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"impersonate",	L"Manipulation tokens d\'accès", mod_mimikatz_impersonate::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"winmine",		L"Manipulation du démineur", mod_mimikatz_winmine::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"minesweeper",	L"Manipulation du démineur 7", mod_mimikatz_minesweeper::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"nogpo",		L"Anti-gpo et patchs divers", mod_mimikatz_nogpo::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"samdump",		L"Dump de SAM", mod_mimikatz_samdump::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"inject",		L"Injecteur de librairies", mod_mimikatz_inject::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"system",		L"Management system", mod_mimikatz_system::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"process",		L"Handling process", mod_mimikatz_process::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"thread",		L"Handling threads", mod_mimikatz_thread::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"service",		L"Handling services", mod_mimikatz_service::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"privilege",	L"Privilege Manipulation", mod_mimikatz_privilege::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"handle",		L"Handle Manipulation", mod_mimikatz_handle::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"impersonate",	L"Access Token Manipulation", mod_mimikatz_impersonate::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"winmine",		L"Minesweeper Handles", mod_mimikatz_winmine::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"minesweeper",	L"Manipulation of minesweeper 7", mod_mimikatz_minesweeper::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"nogpo",		L"Anti-gpo and various patches", mod_mimikatz_nogpo::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"samdump",		L"SAM Dump", mod_mimikatz_samdump::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"inject",		L"Injector libraries", mod_mimikatz_inject::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"ts",			L"Terminal Server", mod_mimikatz_terminalserver::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"divers",		L"Fonctions diverses n\'ayant pas encore assez de corps pour avoir leurs propres module", mod_mimikatz_divers::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"sekurlsa",	L"Dump des sessions courantes par providers LSASS", mod_mimikatz_sekurlsa::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"efs",			L"Manipulations EFS", mod_mimikatz_efs::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"misc",		L"Miscellaneous functions that have not yet enough body to have their own Module", mod_mimikatz_divers::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"sekurlsa",	L"Dump current sessions LSASS", mod_mimikatz_sekurlsa::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"efs",			L"EFS Manipulation", mod_mimikatz_efs::getMimiKatzCommands()));
 	return true;
 }
 
@@ -37,7 +37,7 @@ mimikatz::mimikatz(vector<wstring> * mesArguments) : Kmimikatz(NULL)
 {
 	initLocalModules();
 	SetConsoleTitle(MIMIKATZ_FULL);
-	wcout << MIMIKATZ_FULL << L"\t/* Traitement du Kiwi (" << __DATE__ << L' ' << __TIME__ << L") */" << endl <<
+	wcout << MIMIKATZ_FULL << L"\t/* Usage of Kiwi (" << __DATE__ << L' ' << __TIME__ << L") */" << endl <<
 		L"// http://blog.gentilkiwi.com/mimikatz" << endl;
 
 	bool mustContinue = true;
@@ -128,17 +128,17 @@ bool mimikatz::doCommandeLocale(wstring * fonction, vector<wstring> * arguments)
 				}
 			}
 
-			if(module.empty()) wcout << L"Commande locale \'" << commande << L"\' introuvable" << endl; 
-			else wcout << L"Module : \'" << module << L"\' identifié, mais commande \'" << commande << L"\' introuvable" << endl; 
+			if(module.empty()) wcout << L"Local Command \'" << commande << L"\' found" << endl; 
+			else wcout << L"Module : \'" << module << L"\' identified command \'" << commande << L"\' found" << endl; 
 
-			wcout << endl << L"Description du module : " << monModule->description << endl;
+			wcout << endl << L"Module Description : " << monModule->description << endl;
 			listCommandes(monModule);
 
 			return true;
 		}
 	}
 
-	wcout << L"Module : \'" << module << L"\' introuvable" << endl << endl << L"Modules disponibles : " << endl;
+	wcout << L"Module : \'" << module << L"\' found" << endl << endl << L"Modules available : " << endl;
 	listModules();
 	return true;
 }
@@ -149,7 +149,7 @@ bool mimikatz::openKernel()
 
 	if(!Kmimikatz || Kmimikatz == INVALID_HANDLE_VALUE)
 	{
-		wcout << L"Ouverture du pilote mimikatz : ";
+		wcout << L"Open the driver mimikatz : ";
 		Kmimikatz = CreateFile(L"\\\\.\\mimikatz", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 
 		if(reussite = (Kmimikatz && Kmimikatz != INVALID_HANDLE_VALUE))
@@ -218,11 +218,11 @@ bool mimikatz::doCommandeKernel(std::wstring &commande)
 			}
 			else wcout << L"WriteFile : " << mod_system::getWinError() << endl;
 		}
-		else wcout << L"Impossible de communiquer avec le pilote mimikatz";
+		else wcout << L"Unable to communicate with the driver mimikatz";
 	}
 	else
 	{
-		wcout << L"Commande vide (fermeture forcée) reçue" << endl;
+		wcout << L"Empty command (forced close) received" << endl;
 		closeKernel();
 	}
 
@@ -250,17 +250,17 @@ bool mimikatz::doCommandeDistante(std::wstring &commande)
 						}
 						else
 						{
-							wcout << L"Erreur : pas de réponse possible ; " << mod_system::getWinError() << endl;
+							wcout << L"Error : no response possible ; " << mod_system::getWinError() << endl;
 							break;
 						}
 					} while(*(buffer.begin()) == L'#');
 				}
-				else wcout << L"Erreur : pas d\'écriture possible ; " << mod_system::getWinError() << endl;
+				else wcout << L"Error : not writable ; " << mod_system::getWinError() << endl;
 			}
 		}
-		else wcout << L"Commande vide (déconnexion forcée) reçue" << endl;
+		else wcout << L"Empty command (forced disconnection) received" << endl;
 	}
-	else wcout << L"Erreur : pas ou plus de communication établie" << endl;
+	else wcout << L"Error or no longer established communication" << endl;
 
 	if(!commOk)
 		mod_mimikatz_inject::closeThisCommunicator();

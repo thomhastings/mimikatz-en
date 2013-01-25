@@ -40,7 +40,7 @@ DWORD WINAPI ThreadProc(LPVOID lpParameter)
 	{
 		ptrFunctionString maFonctionString = reinterpret_cast<ptrFunctionString>(GetProcAddress(g_hModule, "getDescription"));
 		
-		wstring monBuffer = L"Bienvenue dans un processus distant\n\t\t\tGentil Kiwi";
+		wstring monBuffer = L"Welcome to a remote process \ n \ t \ t \ tGentil Kiwi";
 		if(maFonctionString)
 		{
 			wstring * maDescription = new wstring();
@@ -88,9 +88,9 @@ DWORD WINAPI ThreadProc(LPVOID lpParameter)
 					}
 					else
 					{
-						monBuffer = L"@Méthode \'";
+						monBuffer = L"@Method \'";
 						monBuffer.append(fonction);
-						monBuffer.append(L"\' introuvable !\n");
+						monBuffer.append(L"\' found !\n");
 					}
 
 					if(!monCommunicator->writeToPipe(monBuffer))

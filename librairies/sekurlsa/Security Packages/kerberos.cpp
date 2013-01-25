@@ -21,7 +21,7 @@ bool searchKerberosFuncs()
 #elif defined _M_IX86
 	BYTE PTRN_WNO8_KerbUnloadLogonSessionTable[]= {0x85, 0xc0, 0x74, 0x1f, 0x53};
 	LONG OFFS_WNO8_KerbUnloadLogonSessionTable	= -(3 + 4);
-	BYTE PTRN_WIN8_KerbUnloadLogonSessionTable[]= {0x85, 0xc0, 0x74, 0x2b, 0x57}; // 2c au lieu de 2b pour avant le RC
+	BYTE PTRN_WIN8_KerbUnloadLogonSessionTable[]= {0x85, 0xc0, 0x74, 0x2b, 0x57}; // 2c instead of 2b before RC
 	LONG OFFS_WIN8_KerbUnloadLogonSessionTable	= -(6 + 4);
 
 	BYTE PTRN_WALL_KerbFreeLogonSessionList[]	= {0xeb, 0x0f, 0x6a, 0x01, 0x57, 0x56, 0xe8};
@@ -59,7 +59,7 @@ bool searchKerberosFuncs()
 			}
 			else
 			{
-				if(mod_system::GLOB_Version.dwBuildNumber < 8400) // petite correction pour avant la RC
+				if(mod_system::GLOB_Version.dwBuildNumber < 8400) // small correction before the RC
 					PTRN_WIN8_KerbUnloadLogonSessionTable[3] = 0x2c;
 				pattern	= PTRN_WIN8_KerbUnloadLogonSessionTable;
 				taille	= sizeof(PTRN_WIN8_KerbUnloadLogonSessionTable);
@@ -76,7 +76,7 @@ bool searchKerberosFuncs()
 __kextdll bool __cdecl getKerberosFunctions(mod_pipe * monPipe, vector<wstring> * mesArguments)
 {
 	wostringstream monStream;
-	monStream << L"** kerberos.dll/lsasrv.dll ** ; Statut recherche : " << (searchKerberosFuncs() ? L"OK :)" : L"KO :(") << endl << endl <<
+	monStream << L"** kerberos.dll/lsasrv.dll ** ; Research Status : " << (searchKerberosFuncs() ? L"OK :)" : L"KO :(") << endl << endl <<
 		L"@KerbGlobalLogonSessionTable = " << KerbGlobalLogonSessionTable << endl <<
 		L"@KerbLogonSessionList        = " << KerbLogonSessionList << endl <<
 		L"@LsaUnprotectMemory          = " << SeckPkgFunctionTable->LsaUnprotectMemory << endl;

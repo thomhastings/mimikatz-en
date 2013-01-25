@@ -8,13 +8,13 @@
 vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> mod_mimikatz_process::getMimiKatzCommands()
 {
 	vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> monVector;
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(list,	L"list",	L"Liste les processus"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(start,	L"start",	L"Exécute un processus, /paused et/ou /sudo"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(suspend,	L"suspend",	L"Suspend l\'exécution d\'un processus"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(resume,	L"resume",	L"Reprend un processus"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(stop,	L"stop",	L"Stoppe un (ou plusieurs) processus"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(modules,	L"modules",	L"Liste les modules (pour le moment du PID courant)"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(iat,		L"iat",		L"Liste la table d\'adressage"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(list,	L"list",	L"List processes"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(start,	L"start",	L"Executes a process, /paused and/or/sudo"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(suspend,	L"suspend",	L"Suspends the execution of a process"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(resume,	L"resume",	L"Resumes a process"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(stop,	L"stop",	L"Stops one (or more) processes"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(modules,	L"modules",	L"List the modules (for the moment current PID)"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(iat,		L"iat",		L"List the addressing table"));
 	return monVector;
 }
 
@@ -26,7 +26,7 @@ bool mod_mimikatz_process::start(vector<wstring> * arguments)
 		bool paused = false;
 		bool sudo = false;
 
-		wcout << L"Demande d\'exécution de : \'" << commande << L"'" << endl;
+		wcout << L"Request to execute: \'" << commande << L"'" << endl;
 		PROCESS_INFORMATION pi = {INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE, 0, 0};
 
 		switch(arguments->size())
@@ -57,10 +57,10 @@ bool mod_mimikatz_process::start(vector<wstring> * arguments)
 		if(mod_process::start(&commande, &pi, paused, sudo))
 		{
 			if(paused)
-				wcout << L" * Le Thread principal est suspendu ! Reprise avec : thread::resume " << pi.dwThreadId << endl;
+				wcout << L" * The main thread is suspended! With recovery: thread summary :: " << pi.dwThreadId << endl;
 
 			if(sudo)
-				wcout << L" * Le processus est démarré avec de fausses données d\'identification" << endl;
+				wcout << L" * The process is started with false credentials" << endl;
 
 			printInfosFromPid(pi.dwProcessId, pi.dwThreadId);
 		}
@@ -69,7 +69,7 @@ bool mod_mimikatz_process::start(vector<wstring> * arguments)
 	else
 	{
 doStartProcess_syntaxerror:
-		wcout << L"Erreur de syntaxe ; " << L"process::start [/paused] [/sudo] commande" << endl;
+		wcout << L"Syntax error ; " << L"process::start [/paused] [/sudo] command" << endl;
 	}
 	
 	return true;
@@ -84,7 +84,7 @@ bool mod_mimikatz_process::stop(vector<wstring> * arguments)
 
 		if(mod_process::getUniqueForName(&monProcess, &procName))
 		{
-			wcout << L"Fin de : " <<  procName << L'\t';
+			wcout << L"End : " <<  procName << L'\t';
 			if(mod_process::stop(monProcess.th32ProcessID))
 				wcout << L"OK";
 			else
@@ -107,7 +107,7 @@ bool mod_mimikatz_process::suspend(vector<wstring> * arguments)
 
 		if(mod_process::getUniqueForName(&monProcess, &procName))
 		{
-			wcout << L"Suspension de : " <<  procName << L'\t';
+			wcout << L"Suspension : " <<  procName << L'\t';
 			if(mod_process::suspend(monProcess.th32ProcessID))
 				wcout << L"OK";
 			else
@@ -130,7 +130,7 @@ bool mod_mimikatz_process::resume(vector<wstring> * arguments)
 
 		if(mod_process::getUniqueForName(&monProcess, &procName))
 		{
-			wcout << L"Reprise de : " <<  procName << L'\t';
+			wcout << L"Resuming : " <<  procName << L'\t';
 			if(mod_process::resume(monProcess.th32ProcessID))
 				wcout << L"OK";
 			else
@@ -183,7 +183,7 @@ bool mod_mimikatz_process::modules(vector<wstring> * arguments)
 	vector<mod_process::KIWI_MODULEENTRY32> * vectorModules = new vector<mod_process::KIWI_MODULEENTRY32>();
 	if(mod_process::getModulesListForProcessId(vectorModules, &processId))
 	{
-		wcout << L"@Base\tTaille\tModule\tPath" << endl;
+		wcout << L"@Base\tSize\tModule\tPath" << endl;
 		for(vector<mod_process::KIWI_MODULEENTRY32>::iterator monModule = vectorModules->begin(); monModule != vectorModules->end(); monModule++)
 		{
 			wcout << monModule->modBaseAddr << L'\t' << monModule->modBaseSize << '\t' << monModule->szModule << L'\t' << monModule->szExePath << endl;
@@ -268,7 +268,7 @@ void mod_mimikatz_process::printInfosFromPid(DWORD &PID, DWORD ThreadId)
 		wcout << "AuthId_h : " << monId.HighPart << endl;
 		wcout << "AuthId_l : " << monId.LowPart << endl;
 	}
-	else wcout << L"Erreur : " <<  mod_system::getWinError() << endl;
+	else wcout << L"Error : " <<  mod_system::getWinError() << endl;
 }
 
 void mod_mimikatz_process::printIATFromModule(mod_process::KIWI_MODULEENTRY32 * monModule, HANDLE monHandle)
@@ -281,7 +281,7 @@ void mod_mimikatz_process::printIATFromModule(mod_process::KIWI_MODULEENTRY32 * 
 	{
 		for(vector<pair<string, vector<mod_process::KIWI_IAT_MODULE>>>::iterator monModuleImporte = monIAT->begin(); monModuleImporte != monIAT->end(); monModuleImporte++)
 		{
-			wcout << L" - Imports depuis : " << monModuleImporte->first.c_str() << endl;
+			wcout << L" - Imports from : " << monModuleImporte->first.c_str() << endl;
 			for(vector<mod_process::KIWI_IAT_MODULE>::iterator maFonctionImporte = monModuleImporte->second.begin(); maFonctionImporte != monModuleImporte->second.end(); maFonctionImporte++)
 			{
 				wcout << L"      " << maFonctionImporte->ptrToFunc << L" -> " << maFonctionImporte->ptrFunc << L' ';

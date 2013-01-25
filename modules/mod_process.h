@@ -61,7 +61,7 @@ public:
 	static bool getList(vector<KIWI_PROCESSENTRY32> * maProcessesvector, wstring * processName = NULL);
 	static bool getUniqueForName(KIWI_PROCESSENTRY32 * monProcess, wstring * processName);
 
-	static bool start(wstring * maCommandLine, PROCESS_INFORMATION * mesInfosProcess, bool paused = false, bool aUsurper = false);
+	static bool start(wstring * maCommandLine, PROCESS_INFORMATION * mesInfosProcess, bool paused = false, bool aUsurper = false, HANDLE leToken = NULL);
 	static bool suspend(DWORD & processId);
 	static bool resume(DWORD & processId);
 	static bool stop(DWORD & processId, DWORD exitCode = 0);

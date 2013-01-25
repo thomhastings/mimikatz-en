@@ -7,6 +7,7 @@
 #pragma once
 #include "globdefs.h"
 #include <sspi.h>
+#include <wincred.h>
 
 typedef struct _KIWI_GENERIC_PRIMARY_CREDENTIAL
 {
@@ -146,6 +147,41 @@ typedef VOID		(WINAPI * PLSA_PROTECT_MEMORY)					(IN PVOID Buffer, IN ULONG Buff
 typedef NTSTATUS	(WINAPI * PLSA_OPEN_TOKEN_BY_LOGON_ID)			(IN PLUID LogonId, OUT HANDLE *RetTokenHandle);
 typedef NTSTATUS	(WINAPI * PLSA_EXPAND_AUTH_DATA_FOR_DOMAIN)		(IN PUCHAR UserAuthData, IN ULONG UserAuthDataSize, IN PVOID Reserved, OUT PUCHAR * ExpandedAuthData, OUT PULONG ExpandedAuthDataSize);
 
+
+
+#ifndef _ENCRYPTED_CREDENTIAL_DEFINED
+#define _ENCRYPTED_CREDENTIAL_DEFINED
+
+typedef struct _ENCRYPTED_CREDENTIALW {
+    CREDENTIALW Cred;
+    ULONG ClearCredentialBlobSize;
+} ENCRYPTED_CREDENTIALW, *PENCRYPTED_CREDENTIALW;
+#endif // _ENCRYPTED_CREDENTIAL_DEFINED
+
+#define CREDP_FLAGS_IN_PROCESS      0x01    // Caller is in-process. Password data may be returned
+#define CREDP_FLAGS_USE_MIDL_HEAP   0x02    // Allocated buffer should use MIDL_user_allocte
+#define CREDP_FLAGS_DONT_CACHE_TI   0x04    // TargetInformation shouldn't be cached for CredGetTargetInfo
+#define CREDP_FLAGS_CLEAR_PASSWORD  0x08    // Credential blob is passed in in-the-clear
+#define CREDP_FLAGS_USER_ENCRYPTED_PASSWORD 0x10    // Credential blob is passed protected by RtlEncryptMemory
+#define CREDP_FLAGS_TRUSTED_CALLER 0x20     // Caller is a trusted process (eg. logon process).
+
+typedef enum _CredParsedUserNameType
+{
+    parsedUsernameInvalid = 0,
+    parsedUsernameUpn,
+    parsedUsernameNt4Style,
+    parsedUsernameCertificate,
+    parsedUsernameNonQualified
+} CredParsedUserNameType;
+
+
+typedef NTSTATUS (NTAPI CredReadFn) (IN PLUID LogonId, IN ULONG CredFlags, IN LPWSTR TargetName, IN ULONG Type, IN ULONG Flags, OUT PENCRYPTED_CREDENTIALW *Credential);
+typedef NTSTATUS (NTAPI CredReadDomainCredentialsFn) (IN PLUID LogonId, IN ULONG CredFlags, IN PCREDENTIAL_TARGET_INFORMATIONW TargetInfo, IN ULONG Flags, OUT PULONG Count, OUT PENCRYPTED_CREDENTIALW **Credential);
+
+typedef VOID (NTAPI CredFreeCredentialsFn) (IN ULONG Count, IN PENCRYPTED_CREDENTIALW *Credentials OPTIONAL);
+typedef NTSTATUS (NTAPI CredWriteFn) (IN PLUID LogonId, IN ULONG CredFlags, IN PENCRYPTED_CREDENTIALW Credential, IN ULONG Flags);
+typedef NTSTATUS (NTAPI CrediUnmarshalandDecodeStringFn)(IN  LPWSTR  MarshaledString, OUT LPBYTE  *Blob, OUT ULONG *BlobSize, OUT BOOLEAN *IsFailureFatal);
+
 typedef struct _LSA_SECPKG_FUNCTION_TABLE {
     PLSA_CREATE_LOGON_SESSION CreateLogonSession;
     PLSA_DELETE_LOGON_SESSION DeleteLogonSession;
@@ -188,15 +224,15 @@ typedef struct _LSA_SECPKG_FUNCTION_TABLE {
     PLSA_CRACK_SINGLE_NAME CrackSingleName;
     PLSA_AUDIT_ACCOUNT_LOGON AuditAccountLogon;
     PLSA_CALL_PACKAGE_PASSTHROUGH CallPackagePassthrough;
-/*#ifdef _WINCRED_H_
+/*#ifdef _WINCRED_H_*/
     CredReadFn *CrediRead;
     CredReadDomainCredentialsFn *CrediReadDomainCredentials;
     CredFreeCredentialsFn *CrediFreeCredentials;
-#else // _WINCRED_H_*/
+/*#else // _WINCRED_H_
     PLSA_PROTECT_MEMORY DummyFunction1;
     PLSA_PROTECT_MEMORY DummyFunction2;
     PLSA_PROTECT_MEMORY DummyFunction3;
-/*#endif // _WINCRED_H_*/
+#endif // _WINCRED_H_*/
     PLSA_PROTECT_MEMORY LsaProtectMemory;
     PLSA_PROTECT_MEMORY LsaUnprotectMemory;
     PLSA_OPEN_TOKEN_BY_LOGON_ID OpenTokenByLogonId;

@@ -134,6 +134,7 @@
     <ClInclude Include="..\modules\mod_thread.h" />
     <ClInclude Include="..\modules\mod_ts.h" />
     <ClInclude Include="..\modules\mod_windows.h" />
+    <ClInclude Include="..\modules\mod_winsta_desktop.h" />
     <ClInclude Include="mimikatz.h" />
     <ClInclude Include="modules\mod_mimikatz_crypto.h" />
     <ClInclude Include="modules\mod_mimikatz_divers.h" />
@@ -157,6 +158,7 @@
     <ClInclude Include="modules\Security Packages\kerberos.h" />
     <ClInclude Include="modules\Security Packages\livessp.h" />
     <ClInclude Include="modules\Security Packages\msv1_0.h" />
+    <ClInclude Include="modules\Security Packages\ssp.h" />
     <ClInclude Include="modules\Security Packages\tspkg.h" />
     <ClInclude Include="modules\Security Packages\wdigest.h" />
   </ItemGroup>
@@ -181,6 +183,7 @@
     <ClCompile Include="..\modules\mod_thread.cpp" />
     <ClCompile Include="..\modules\mod_ts.cpp" />
     <ClCompile Include="..\modules\mod_windows.cpp" />
+    <ClCompile Include="..\modules\mod_winsta_desktop.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mimikatz.cpp" />
     <ClCompile Include="modules\mod_mimikatz_crypto.cpp" />
@@ -205,6 +208,7 @@
     <ClCompile Include="modules\Security Packages\kerberos.cpp" />
     <ClCompile Include="modules\Security Packages\livessp.cpp" />
     <ClCompile Include="modules\Security Packages\msv1_0.cpp" />
+    <ClCompile Include="modules\Security Packages\ssp.cpp" />
     <ClCompile Include="modules\Security Packages\tspkg.cpp" />
     <ClCompile Include="modules\Security Packages\wdigest.cpp" />
   </ItemGroup>

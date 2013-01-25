@@ -41,13 +41,19 @@ bool mod_crypto::getCertNameFromCertCTX(PCCERT_CONTEXT certCTX, wstring * certNa
 {
 	bool reussite = false;
 	wchar_t * monBuffer = NULL;
-	DWORD tailleRequise = CertGetNameString(certCTX, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, NULL, 0);
-	if(tailleRequise > 1)
+	
+	DWORD maRecherche[] = {CERT_NAME_FRIENDLY_DISPLAY_TYPE, CERT_NAME_DNS_TYPE, CERT_NAME_EMAIL_TYPE, CERT_NAME_UPN_TYPE, CERT_NAME_URL_TYPE};
+
+	for(DWORD i = 0; !reussite && (i < (sizeof(maRecherche) / sizeof(DWORD))); i++)
 	{
-		monBuffer = new wchar_t[tailleRequise];
-		reussite = CertGetNameString(certCTX, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, monBuffer, tailleRequise) > 1;
-		certName->assign(monBuffer);
-		delete[] monBuffer;
+		DWORD tailleRequise = CertGetNameString(certCTX, maRecherche[i], 0, NULL, NULL, 0);
+		if(tailleRequise > 1)
+		{
+			monBuffer = new wchar_t[tailleRequise];
+			reussite = CertGetNameString(certCTX, maRecherche[i], 0, NULL, monBuffer, tailleRequise) > 1;
+			certName->assign(monBuffer);
+			delete[] monBuffer;
+		}	
 	}
 	return reussite;
 }

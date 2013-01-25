@@ -17,9 +17,9 @@ bool mod_patch::patchModuleOfService(wstring serviceName, wstring moduleName, BY
 			wcout << L"Service : " << monService.serviceDisplayName << endl;
 			reussite = patchModuleOfPID(monService.ServiceStatusProcess.dwProcessId, moduleName, patternToSearch, szPatternToSearch, patternToPlace, szPatternToPlace, offsetForPlace);
 		}
-		else wcout << L"Le service : " << serviceName << L" (" << monService.serviceDisplayName << L") ; n\'a pas l\'air très actif" << endl;
+		else wcout << L"The service : " << serviceName << L" (" << monService.serviceDisplayName << L") ; did not seem busy" << endl;
 	}
-	else wcout << L"Impossible de trouver le service : " << serviceName << L" ; " << mod_system::getWinError() << endl;
+	else wcout << L"Unable to find the service : " << serviceName << L" ; " << mod_system::getWinError() << endl;
 
 	return reussite;
 }
@@ -36,7 +36,7 @@ bool mod_patch::patchModuleOfPID(DWORD pid, wstring moduleName, BYTE * patternTo
 
 		if(HANDLE processHandle = OpenProcess(PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ, false, pid))
 		{
-			wcout << L"Recherche des patterns dans : " << moduleName << L"@pid(" << pid << L")" << endl;
+			wcout << L"Search patterns in : " << moduleName << L"@pid(" << pid << L")" << endl;
 
 			BYTE * addrPattern = NULL;
 			if(mod_memory::searchMemory(baseAddr, baseAddr + taille, patternToSearch, &addrPattern, szPatternToSearch, true, processHandle))
@@ -139,7 +139,7 @@ bool mod_patch::checkVersion(vector<OS> * vectorValid)
 	}	
 	
 	if(!reussite)
-		wcout << L"La version du système d\'exploitation actuelle n\'est pas supportée par cette fonction." << endl;
+		wcout << L"The version of the current operating system is not supported by this function." << endl;
 
 	return reussite;
 }

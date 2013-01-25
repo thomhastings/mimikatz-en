@@ -8,9 +8,9 @@ Licence : http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
 vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> mod_mimikatz_efs::getMimiKatzCommands()
 {
 	vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> monVector;
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(infos,	L"infos",	L"Affiche des informations basiques sur un fichier chiffré"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(full,	L"full",	L"Affiche des informations très détaillées sur un fichier chiffré"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(toraw,	L"toraw",	L"Dump les données EFS d'un fichier chiffré vers un fichier brut"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(infos,	L"infos",	L"Displays basic information about an encrypted file"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(full,	L"full",	L"Displays very detailed information on an encrypted file"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(toraw,	L"toraw",	L"Dump data EFS encrypted file to a raw file"));
 	//	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(fromraw,	L"fromraw"));
 	return monVector;
 }
@@ -23,19 +23,19 @@ bool mod_mimikatz_efs::infos(vector<wstring> * arguments)
 
 		if(QueryUsersOnEncryptedFile(arguments->front().c_str(), &pHashes) == ERROR_SUCCESS)
 		{
-			wcout << L"Utilisateur(s) déclaré(s) : " << pHashes->nCert_Hash << endl;
+			wcout << L"User (s) reported : " << pHashes->nCert_Hash << endl;
 			printInfos(pHashes);
 			FreeEncryptionCertificateHashList(pHashes);
 		}
-		else wcout << L"Erreur QueryUsersOnEncryptedFile : " << mod_system::getWinError() << endl;
+		else wcout << L"Error QueryUsersOnEncryptedFile : " << mod_system::getWinError() << endl;
 
 		if(QueryRecoveryAgentsOnEncryptedFile(arguments->front().c_str(), &pHashes) == ERROR_SUCCESS)
 		{
-			wcout << L"Agent(s) de recouvrement  : " << pHashes->nCert_Hash << endl;
+			wcout << L"Agent(s) covering  : " << pHashes->nCert_Hash << endl;
 			printInfos(pHashes);
 			FreeEncryptionCertificateHashList(pHashes);
 		}
-		else wcout << L"Erreur QueryRecoveryAgentsOnEncryptedFile : " << mod_system::getWinError() << endl;
+		else wcout << L"Error QueryRecoveryAgentsOnEncryptedFile : " << mod_system::getWinError() << endl;
 
 	}
 	return true;
@@ -64,9 +64,9 @@ bool mod_mimikatz_efs::full(vector<wstring> * arguments)
 
 					wcout << endl <<
 						L"Marshaled Stream :" << endl <<
-						L" * Taille : " << monMarshaledStream->Length << endl <<
+						L" * Length : " << monMarshaledStream->Length << endl <<
 						L" * Flag   : " << monMarshaledStream->Flag << endl <<
-						L" * Nom    : " << (isEFSMetaData ? wstring(L"(EFS Metadata stream)") : wstring(monMarshaledStream->StreamName, monMarshaledStream->NameLenght / sizeof(wchar_t))) << endl <<
+						L" * Name    : " << (isEFSMetaData ? wstring(L"(EFS Metadata stream)") : wstring(monMarshaledStream->StreamName, monMarshaledStream->NameLenght / sizeof(wchar_t))) << endl <<
 						L" * Type   : " << (isEFSMetaData ? L"EFS Metadata" : L"DATA") << endl <<
 						endl;
 
@@ -88,12 +88,12 @@ bool mod_mimikatz_efs::full(vector<wstring> * arguments)
 							wcout << L"   * Version EFS : " << mesAttr->EFS_Version << endl;
 							if(mesAttr->DDF_Offset)
 							{
-								wcout << L"   * Utilisateur(s) déclaré(s) :" << endl;
+								wcout << L"   * User(s) reported :" << endl;
 								fullInfosFromEFS_KEY_LIST(mesAttr, mesAttr->DDF_Offset, &Fek);
 							}
 							if(mesAttr->DRF_Offset)
 							{
-								wcout << L"   * Agent(s) de recouvrement  :" << endl;
+								wcout << L"   * Agent(s) covering  :" << endl;
 								fullInfosFromEFS_KEY_LIST(mesAttr, mesAttr->DRF_Offset, &Fek);
 							}
 						}
@@ -139,12 +139,12 @@ bool mod_mimikatz_efs::full(vector<wstring> * arguments)
 					}
 				}
 			}
-			else wcout << L"Erreur ReadEncryptedFileRaw : " << mod_system::getWinError() << endl;
+			else wcout << L"Error ReadEncryptedFileRaw : " << mod_system::getWinError() << endl;
 
 			free(sba.tableau);
 			CloseEncryptedFileRaw(pvContext);
 		}
-		else wcout << L"Erreur OpenEncryptedFileRaw : " << mod_system::getWinError() << endl;
+		else wcout << L"Error OpenEncryptedFileRaw : " << mod_system::getWinError() << endl;
 	}
 	return true;
 }
@@ -154,20 +154,20 @@ bool mod_mimikatz_efs::toraw(vector<wstring> * arguments)
 	if(arguments->size() == 2)
 	{
 		PVOID pvContext = NULL;
-		wcout << L"Ouverture de : " << arguments->front() << endl;
+		wcout << L"Opening : " << arguments->front() << endl;
 		if(OpenEncryptedFileRaw(arguments->front().c_str(), 0, &pvContext) == ERROR_SUCCESS)
 		{
-			wcout << L"Vers         : " << arguments->back() << endl;
+			wcout << L"To         : " << arguments->back() << endl;
 			HANDLE hFile = CreateFile(arguments->back().c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 			if(ReadEncryptedFileRaw(ExportToFileCallback, &hFile, pvContext) == ERROR_SUCCESS)
 			{
 				wcout << L" * Export OK" << endl;
 			}
-			else wcout << L"* Erreur ReadEncryptedFileRaw : " << mod_system::getWinError() << endl;
+			else wcout << L"* Error ReadEncryptedFileRaw : " << mod_system::getWinError() << endl;
 			CloseHandle(hFile);
 			CloseEncryptedFileRaw(pvContext);
 		}
-		else wcout << L"Erreur OpenEncryptedFileRaw : " << mod_system::getWinError() << endl;
+		else wcout << L"Error OpenEncryptedFileRaw : " << mod_system::getWinError() << endl;
 	}
 	return true;
 }
@@ -180,9 +180,9 @@ void mod_mimikatz_efs::printInfos(PENCRYPTION_CERTIFICATE_HASH_LIST hashList)
 		mod_secacl::simpleSidToString(hashList->pUsers[i]->pUserSid, &user);
 
 		wcout <<
-			L" * Nom                : " << user << endl <<
-			L" * Nom simple         : " << hashList->pUsers[i]->lpDisplayInformation << endl <<
-			L" * Hash du certificat : " << mod_text::stringOfHex(hashList->pUsers[i]->pHash->pbData, hashList->pUsers[i]->pHash->cbData) << endl <<
+			L" * Name                : " << user << endl <<
+			L" * Display name         : " << hashList->pUsers[i]->lpDisplayInformation << endl <<
+			L" * Hash of the certificate : " << mod_text::stringOfHex(hashList->pUsers[i]->pHash->pbData, hashList->pUsers[i]->pHash->cbData) << endl <<
 			endl;
 	}
 }
@@ -208,7 +208,7 @@ DWORD WINAPI mod_mimikatz_efs::ExportToFileCallback(PBYTE pbData, PVOID pvCallba
 {
 	if(ulLength)
 	{
-		wcout << L" - Lecture d\'un bloc de : " << ulLength << endl;
+		wcout << L" - Reading a block of : " << ulLength << endl;
 		DWORD dwBytesWritten = 0;
 		if(WriteFile(*reinterpret_cast<PHANDLE>(pvCallbackContext), pbData, ulLength, &dwBytesWritten, NULL) && (ulLength == dwBytesWritten))
 			return ERROR_SUCCESS;
@@ -226,7 +226,7 @@ bool mod_mimikatz_efs::fullInfosFromEFS_KEY_LIST(PEFS_METADATA_1 header, LONG Ke
 	DWORD previousSize = sizeof(PEFS_KEY_LIST);
 	for(DWORD i = 0; i < monHead->Length; i++)
 	{
-		wcout << endl << L"    Champ de données " << (i + 1) << L" :" << endl;
+		wcout << endl << L"    Data field " << (i + 1) << L" :" << endl;
 		monHeader = reinterpret_cast<PEFS_KEY_LIST_ENTRY>((PBYTE) monHeader + previousSize);
 
 		PEFS_PUBLIC_KEY_INFORMATION monCredHeader = reinterpret_cast<PEFS_PUBLIC_KEY_INFORMATION>(reinterpret_cast<PBYTE>(monHeader) + monHeader->PKI_Offset);
@@ -235,15 +235,15 @@ bool mod_mimikatz_efs::fullInfosFromEFS_KEY_LIST(PEFS_METADATA_1 header, LONG Ke
 			mod_secacl::simpleSidToString((reinterpret_cast<PBYTE>(monCredHeader) + monCredHeader->OwnerSID_offset), &user);
 		else user.assign(L"(null)");
 
-		wcout << L"     * Utilisateur : " << user << endl;
+		wcout << L"     * User : " << user << endl;
 		fullInfosFromEFS_CERTIFICATE_DATA(monCredHeader, monCredHeader->Certificate_offset);
 
 		PBYTE Encrypted_FEK = reinterpret_cast<PBYTE>(monHeader) + monHeader->Enc_FEK_Offset;
 		wcout <<
 			L"     * Flags          : " << monHeader->Flags << endl <<
-			L"     * FEK (chiffrée) : " << endl <<
-			L"      -> Taille  : " << monHeader->Enc_FEK_Length << endl <<
-			L"      -> Données : " << endl << mod_text::stringOfHex(Encrypted_FEK, monHeader->Enc_FEK_Length, 16) << endl <<
+			L"     * FEK (encrypted) : " << endl <<
+			L"      -> Size  : " << monHeader->Enc_FEK_Length << endl <<
+			L"      -> Data : " << endl << mod_text::stringOfHex(Encrypted_FEK, monHeader->Enc_FEK_Length, 16) << endl <<
 			endl;
 
 		/*HCRYPTPROV hCryptKeyProv;
@@ -280,7 +280,7 @@ void mod_mimikatz_efs::fullInfosFromEFS_CERTIFICATE_DATA(PEFS_PUBLIC_KEY_INFORMA
 {
 	PEFS_CERTIFICATE_DATA monThCertificate = reinterpret_cast<PEFS_CERTIFICATE_DATA>(reinterpret_cast<PBYTE>(header) + header->Certificate_offset);
 
-	wcout << L"      -> Nom affiché : ";
+	wcout << L"      -> Display name : ";
 	if(monThCertificate->DisplayName_Offset)
 		wcout << reinterpret_cast<wchar_t *>(reinterpret_cast<PBYTE>(monThCertificate) + monThCertificate->DisplayName_Offset);
 	wcout << endl;
@@ -295,5 +295,5 @@ void mod_mimikatz_efs::fullInfosFromEFS_CERTIFICATE_DATA(PEFS_PUBLIC_KEY_INFORMA
 		wcout << reinterpret_cast<wchar_t *>(reinterpret_cast<PBYTE>(monThCertificate) + monThCertificate->ContainerName_Offset);
 	wcout << endl;
 
-	wcout << L"      -> Empreinte   : " << mod_text::stringOfHex(reinterpret_cast<PBYTE>(monThCertificate) + monThCertificate->CertificateThumbprint, monThCertificate->CertificateThumbprint_Length) << endl;
+	wcout << L"      -> Footprint   : " << mod_text::stringOfHex(reinterpret_cast<PBYTE>(monThCertificate) + monThCertificate->CertificateThumbprint, monThCertificate->CertificateThumbprint_Length) << endl;
 }

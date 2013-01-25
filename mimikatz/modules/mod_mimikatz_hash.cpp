@@ -8,8 +8,8 @@
 vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> mod_mimikatz_hash::getMimiKatzCommands()
 {
 	vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> monVector;
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(lm,		L"lm",		L"Hash LanManager (LM) d\'une chaîne de caractères"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(ntlm,	L"ntlm",	L"Hash NT LanManger (NTLM) d\'une chaîne de caractères"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(lm,		L"lm",		L"LanManager (LM) hash string"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(ntlm,	L"ntlm",	L"NT LanManger (NTLM) hash string"));
 	return monVector;
 }
 
@@ -23,7 +23,7 @@ bool mod_mimikatz_hash::lm(vector<wstring> * arguments)
 	if(mod_hash::lm(&chaine, &hash))
 		wcout << L"LM(\'" << chaine << L"\') = " << hash << endl;
 	else
-		wcout << L"Erreur de calcul du hash LM" << endl;
+		wcout << L"Miscalculation of hash LM" << endl;
 	return true;
 }
 
@@ -37,6 +37,6 @@ bool mod_mimikatz_hash::ntlm(vector<wstring> * arguments)
 	if(mod_hash::ntlm(&chaine, &hash))
 		wcout << L"NTLM(\'" << chaine << L"\') = " << hash << endl;
 	else
-		wcout << L"Erreur de calcul du hash NTLM" << endl;
+		wcout << L"Miscalculation of hash NTLM" << endl;
 	return true;
 }

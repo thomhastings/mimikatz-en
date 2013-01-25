@@ -8,18 +8,18 @@
 vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> mod_mimikatz_privilege::getMimiKatzCommands()
 {
 	vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> monVector;
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(list,	L"list",	L"Liste les privilèges"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(enable,	L"enable",	L"Active un ou plusieurs privilèges"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(remove,	L"remove",	L"Retire un ou plusieurs privilèges"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(disable,	L"disable",	L"Désactive un ou plusieurs privilèges"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(list,	L"list",	L"List privileges"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(enable,	L"enable",	L"Enable one or more privileges"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(remove,	L"remove",	L"Removes one or more privileges"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(disable,	L"disable",	L"Disables one or more privileges"));
 	/* Raccourçis */
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(debug,		L"debug",		L"Demande (ou désactive) le privilège Debug"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(security,	L"security",	L"Demande (ou désactive) le privilège Security"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(tcb,			L"tcb",			L"Demande (ou désactive) le privilège Tcb"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(impersonate,	L"impersonate",	L"Demande (ou désactive) le privilège Impersonate"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(assign,		L"assign",		L"Demande (ou désactive) le privilège AssignPrimaryToken"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(shutdown,	L"shutdown",	L"Demande (ou désactive) le privilège Shutdown"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(takeowner,	L"takeowner",	L"Demande (ou désactive) le privilège TakeOwnership"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(debug,		L"debug",		L"Enable (or disable) the debug privilege Debug"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(security,	L"security",	L"Enable (or disable) the Security privilege"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(tcb,			L"tcb",			L"Enable (or disable) the TCB privilege"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(impersonate,	L"impersonate",	L"Enable (or disable) the Impersonate privilege"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(assign,		L"assign",		L"Enable (or disable) the AssignPrimaryToken privilege"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(shutdown,	L"shutdown",	L"Enable (or disable) the Shutdown privilege"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(takeowner,	L"takeowner",	L"Enable (or disable) the TakeOwnership privilege"));
 	return monVector;
 }
 
@@ -45,7 +45,7 @@ bool mod_mimikatz_privilege::simplePriv(wstring priv, vector<wstring> * argument
 {
 	bool ajout = arguments->empty();
 	
-	wcout << L"Demande d" << (ajout ? L"\'ACTIVATION" : L"e RETRAIT") << L" du privilège : " << priv << L" : ";
+	wcout << L"Request" << (ajout ? L"\'ACTIVATION" : L"e RETRAIT") << L"privilege : " << priv << L" : ";
 	
 	vector<pair<wstring, DWORD>> * mesPrivs = new vector<pair<wstring, DWORD>>;
 	mesPrivs->push_back(make_pair(priv, ajout ? SE_PRIVILEGE_ENABLED : 0));

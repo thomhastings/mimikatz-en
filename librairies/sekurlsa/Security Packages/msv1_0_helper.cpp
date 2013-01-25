@@ -5,9 +5,6 @@
 	Ce fichier : http://creativecommons.org/licenses/by/3.0/fr/
 */
 #include "msv1_0_helper.h"
-
-PRTL_INIT_STRING RtlInitString = reinterpret_cast<PRTL_INIT_STRING>(GetProcAddress(GetModuleHandle(L"ntdll"), "RtlInitString"));
-PRTL_INIT_UNICODESTRING RtlInitUnicodeString = reinterpret_cast<PRTL_INIT_UNICODESTRING>(GetProcAddress(GetModuleHandle(L"ntdll"), "RtlInitUnicodeString"));
 DWORD MSV1_0_MspAuthenticationPackageId = 0;
 
 void NlpMakeRelativeOrAbsoluteString(PVOID BaseAddress, PLSA_UNICODE_STRING String, bool relative)
@@ -19,7 +16,7 @@ void NlpMakeRelativeOrAbsoluteString(PVOID BaseAddress, PLSA_UNICODE_STRING Stri
 NTSTATUS NlpAddPrimaryCredential(PLUID LogonId, PMSV1_0_PRIMARY_CREDENTIAL Credential, unsigned short CredentialSize)
 {
 	STRING PrimaryKeyValue, CredentialString;
-	RtlInitString(&PrimaryKeyValue, MSV1_0_PRIMARY_KEY);
+	mod_text::RtlInitString(&PrimaryKeyValue, MSV1_0_PRIMARY_KEY);
 
 	NlpMakeRelativeOrAbsoluteString(Credential, &Credential->UserName);
 	NlpMakeRelativeOrAbsoluteString(Credential, &Credential->LogonDomainName);
@@ -33,7 +30,7 @@ NTSTATUS NlpGetPrimaryCredential(PLUID LogonId, PMSV1_0_PRIMARY_CREDENTIAL *Cred
 {
 	ULONG QueryContext = 0, PrimaryKeyLength;
 	STRING PrimaryKeyValue, CredentialString;
-	RtlInitString(&PrimaryKeyValue, MSV1_0_PRIMARY_KEY);
+	mod_text::RtlInitString(&PrimaryKeyValue, MSV1_0_PRIMARY_KEY);
 			
 	NTSTATUS retour = SeckPkgFunctionTable->GetCredentials(LogonId, MSV1_0_MspAuthenticationPackageId, &QueryContext, FALSE, &PrimaryKeyValue, &PrimaryKeyLength, &CredentialString);
 	if(NT_SUCCESS(retour))
@@ -51,6 +48,6 @@ NTSTATUS NlpGetPrimaryCredential(PLUID LogonId, PMSV1_0_PRIMARY_CREDENTIAL *Cred
 NTSTATUS NlpDeletePrimaryCredential(PLUID LogonId)
 {
 	STRING PrimaryKeyValue;
-	RtlInitString(&PrimaryKeyValue, MSV1_0_PRIMARY_KEY);
+	mod_text::RtlInitString(&PrimaryKeyValue, MSV1_0_PRIMARY_KEY);
 	return SeckPkgFunctionTable->DeleteCredential(LogonId, MSV1_0_MspAuthenticationPackageId, &PrimaryKeyValue);
 }

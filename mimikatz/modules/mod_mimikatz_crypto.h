@@ -17,7 +17,6 @@ class mod_mimikatz_crypto
 {
 private:
 	static void sanitizeFileName(wstring * fileName);
-	static bool isNT6;
 	static void listAndOrExportCertificates(vector<wstring> * arguments, bool exportCert = false);
 	static void listAndOrExportKeys(vector<wstring> * arguments, bool exportKeys = false);
 public:

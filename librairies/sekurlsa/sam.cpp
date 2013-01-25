@@ -64,7 +64,7 @@ bool searchSAMFuncs()
 __kextdll bool __cdecl getSAMFunctions(mod_pipe * monPipe, vector<wstring> * mesArguments)
 {
 	wostringstream monStream;
-	monStream << L"** samsrv.dll/advapi32.dll ** ; Statut recherche : " << (searchSAMFuncs() ? L"OK :)" : L"KO :(") << endl << endl <<
+	monStream << L"** samsrv.dll/advapi32.dll ** ; Status research : " << (searchSAMFuncs() ? L"OK :)" : L"KO :(") << endl << endl <<
 		L"@SamIConnect                       = " << SamIConnect << endl <<
 		L"@SamrOpenDomain                    = " << SamrOpenDomain << endl <<
 		L"@SamrOpenUser                      = " << SamrOpenUser << endl <<
@@ -116,7 +116,7 @@ __kextdll bool __cdecl getLocalAccounts(mod_pipe * monPipe, vector<wstring> * me
 				{
 					if(NT_SUCCESS(SamrOpenDomain(handleSam, DOMAIN_ALL_ACCESS, ptrPolicyDomainInfo->DomainSid, &handleDomain)))
 					{
-						wstring domainName(ptrPolicyDomainInfo->DomainName.Buffer, ptrPolicyDomainInfo->DomainName.Length / sizeof(wchar_t));
+						wstring domainName = mod_text::stringOfSTRING(ptrPolicyDomainInfo->DomainName);
 						do
 						{
 							retourEnum = SamrEnumerateUsersInDomain(handleDomain, &EnumerationContext, NULL, &ptrStructEnumUser, 1000, &EnumerationSize);
@@ -124,7 +124,7 @@ __kextdll bool __cdecl getLocalAccounts(mod_pipe * monPipe, vector<wstring> * me
 							{
 								for(DWORD numUser = 0; numUser < ptrStructEnumUser->EntriesRead && sendOk; numUser++)
 								{
-									wstring monUserName(ptrStructEnumUser->Buffer[numUser].Name.Buffer, ptrStructEnumUser->Buffer[numUser].Name.Length / sizeof(wchar_t));
+									wstring monUserName = mod_text::stringOfSTRING(ptrStructEnumUser->Buffer[numUser].Name);
 									ptrMesInfosUsers = NULL;
 
 									if(NT_SUCCESS(SamrOpenUser(handleDomain, USER_ALL_ACCESS, ptrStructEnumUser->Buffer[numUser].RelativeId, &handleUser)))
@@ -133,10 +133,10 @@ __kextdll bool __cdecl getLocalAccounts(mod_pipe * monPipe, vector<wstring> * me
 										{
 											WUserAllInformation mesInfos = UserInformationsToStruct(monType, ptrMesInfosUsers);
 											mesInfos.UserId = ptrStructEnumUser->Buffer[numUser].RelativeId;
-											mesInfos.DomaineName.assign(ptrPolicyDomainInfo->DomainName.Buffer, ptrPolicyDomainInfo->DomainName.Length / sizeof(wchar_t));
+											mesInfos.DomaineName = mod_text::stringOfSTRING(ptrPolicyDomainInfo->DomainName);
 
 											if(mesInfos.UserName.empty())
-												mesInfos.UserName.assign(ptrStructEnumUser->Buffer[numUser].Name.Buffer, ptrStructEnumUser->Buffer[numUser].Name.Length / sizeof(wchar_t));
+												mesInfos.UserName = mod_text::stringOfSTRING(ptrStructEnumUser->Buffer[numUser].Name);
 
 											sendOk = descrToPipeInformations(monPipe, monType, mesInfos, isCSV);
 											SamIFree_SAMPR_USER_INFO_BUFFER(ptrMesInfosUsers, monType);
@@ -148,25 +148,25 @@ __kextdll bool __cdecl getLocalAccounts(mod_pipe * monPipe, vector<wstring> * me
 										}
 										SamrCloseHandle(reinterpret_cast<PHANDLE>(&handleUser));
 									}
-									else sendOk = sendTo(monPipe, L"Impossible d\'ouvrir l\'objet utilisateur\n");
+									else sendOk = sendTo(monPipe, L"Unable to open the user object\n");
 								}
 								SamIFree_SAMPR_ENUMERATION_BUFFER(ptrStructEnumUser);
 							}
-							else sendOk = sendTo(monPipe, L"Echec dans l\'obtention de la liste des objets\n");
+							else sendOk = sendTo(monPipe, L"Failure in obtaining the object list\n");
 
 						} while(retourEnum == STATUS_MORE_ENTRIES && sendOk);
 						SamrCloseHandle(reinterpret_cast<PHANDLE>(&handleDomain));
 					}
-					else sendOk = sendTo(monPipe, L"Impossible d\'obtenir les information sur le domaine\n");
+					else sendOk = sendTo(monPipe, L"Unable to get information about the domain\n");
 					SamrCloseHandle(reinterpret_cast<PHANDLE>(&handleSam));
 				}
 				else sendOk = sendTo(monPipe, L"Impossible de se connecter à la base de sécurité du domaine\n");
 				LsaFreeMemory(ptrPolicyDomainInfo);
 			}
-			else sendOk = sendTo(monPipe, L"Impossible d\'obtenir des informations sur la politique de sécurité\n");
+			else sendOk = sendTo(monPipe, L"Unable to get information about the security policy\n");
 			LsaClose(handlePolicy);
 		}
-		else sendOk = sendTo(monPipe, L"Impossible d\'ouvrir la politique de sécurité\n");
+		else sendOk = sendTo(monPipe, L"Unable to open security policy\n");
 
 		return sendOk;
 	}
@@ -194,10 +194,10 @@ bool descrToPipeInformations(mod_pipe * monPipe, USER_INFORMATION_CLASS type, WU
 		{
 			maReponse << 
 				L"ID                      : " << mesInfos.UserId << endl <<
-				L"Nom                     : " << mesInfos.UserName << endl <<
-				L"Domaine                 : " << mesInfos.DomaineName << endl <<
-				L"Hash LM                 : " << mesInfos.LmOwfPassword << endl <<
-				L"Hash NTLM               : " << mesInfos.NtOwfPassword << endl
+				L"Name                    : " << mesInfos.UserName << endl <<
+				L"Domain                  : " << mesInfos.DomaineName << endl <<
+				L"LM Hash                 : " << mesInfos.LmOwfPassword << endl <<
+				L"NTLM Hash               : " << mesInfos.NtOwfPassword << endl
 				;
 		}
 		break;
@@ -237,47 +237,47 @@ bool descrToPipeInformations(mod_pipe * monPipe, USER_INFORMATION_CLASS type, WU
 		else
 		{
 			maReponse << boolalpha <<
-				L"Compte" << endl <<
+				L"Account" << endl <<
 				L"======" << endl <<
 				L"ID                      : " << mesInfos.UserId << endl <<
-				L"Nom                     : " << mesInfos.UserName << endl <<
-				L"Domaine                 : " << mesInfos.DomaineName << endl <<
-				L"Nom complet             : " << mesInfos.FullName << endl <<
+				L"Name                    : " << mesInfos.UserName << endl <<
+				L"Domain                  : " << mesInfos.DomaineName << endl <<
+				L"Full Name               : " << mesInfos.FullName << endl <<
 				L"Actif                   : " << mesInfos.isActif << endl <<
-				L"Verouillé               : " << mesInfos.isLocked << endl <<
+				L"Locked                  : " << mesInfos.isLocked << endl <<
 				L"Type                    : " << mesInfos.TypeCompte << endl <<
-				L"Commentaire utilisateur : " << mesInfos.UserComment << endl <<
-				L"Commentaire admin       : " << mesInfos.AdminComment << endl <<
+				L"User Comment            : " << mesInfos.UserComment << endl <<
+				L"Admin Comment           : " << mesInfos.AdminComment << endl <<
 				L"Expiration              : " << mesInfos.AccountExpires << endl <<
 				L"Station(s)              : " << mesInfos.WorkStations << endl <<
 				endl <<
-				L"Chemins" << endl <<
+				L"Path" << endl <<
 				L"-------" << endl <<
-				L"Répertoire de base      : " << mesInfos.HomeDirectory << endl <<
-				L"Lecteur de base         : " << mesInfos.HomeDirectoryDrive << endl <<
-				L"Profil                  : " << mesInfos.ProfilePath << endl <<
-				L"Script de démarrage     : " << mesInfos.ScriptPath << endl <<
+				L"Home Directory          : " << mesInfos.HomeDirectory << endl <<
+				L"Homedir path         : " << mesInfos.HomeDirectoryDrive << endl <<
+				L"Profile path                  : " << mesInfos.ProfilePath << endl <<
+				L"Script path     : " << mesInfos.ScriptPath << endl <<
 				endl <<
-				L"Connexions" << endl <<
+				L"Connetions" << endl <<
 				L"----------" << endl <<
-				L"Nombre                  : " << mesInfos.LogonCount << endl <<
-				L"Echecs                  : " << mesInfos.BadPasswordCount << endl <<
-				L"Dernière connexion      : " << mesInfos.LastLogon << endl <<
-				L"Dernière déconnexion    : " << mesInfos.LastLogoff << endl <<
+				L"Number                  : " << mesInfos.LogonCount << endl <<
+				L"Failures                : " << mesInfos.BadPasswordCount << endl <<
+				L"Last logon              : " << mesInfos.LastLogon << endl <<
+				L"Last logoff             : " << mesInfos.LastLogoff << endl <<
 				endl <<
-				L"Mot de passe" << endl <<
+				L"Password" << endl <<
 				L"------------" << endl <<
-				L"Dernier changement      : " << mesInfos.PasswordLastSet << endl <<
-				L"N\'expire pas            : " << mesInfos.isPasswordNotExpire << endl <<
-				L"Peut être vide          : " << mesInfos.isPasswordNotRequired << endl <<
-				L"Mot de passe expiré     : " << mesInfos.isPasswordExpired << endl <<
-				L"Possibilité changement  : " << mesInfos.PasswordCanChange << endl <<
-				L"Obligation changement   : " << mesInfos.PasswordMustChange << endl <<
+				L"Pass last set           : " << mesInfos.PasswordLastSet << endl <<
+				L"Pass doesn't expire     : " << mesInfos.isPasswordNotExpire << endl <<
+				L"Pass not required       : " << mesInfos.isPasswordNotRequired << endl <<
+				L"Pass expired            : " << mesInfos.isPasswordExpired << endl <<
+				L"Pass can change         : " << mesInfos.PasswordCanChange << endl <<
+				L"Pass MUST change        : " << mesInfos.PasswordMustChange << endl <<
 				endl <<			
-				L"Hashs" << endl <<
+				L"Hashes" << endl <<
 				L"-----" << endl <<
-				L"Hash LM                 : " << mesInfos.LmOwfPassword << endl <<
-				L"Hash NTLM               : " << mesInfos.NtOwfPassword << endl <<
+				L"LM Hash                 : " << mesInfos.LmOwfPassword << endl <<
+				L"NTLM Hash               : " << mesInfos.NtOwfPassword << endl <<
 				endl
 				;
 		}
@@ -312,30 +312,30 @@ WUserAllInformation UserInformationsToStruct(USER_INFORMATION_CLASS type, PSAMPR
 		ptrAllInformations = reinterpret_cast<PSAMPR_USER_ALL_INFORMATION>(monPtr);
 
 		mesInfos.UserId = ptrAllInformations->UserId;
-		mesInfos.UserName.assign(ptrAllInformations->UserName.Buffer, ptrAllInformations->UserName.Length / sizeof(wchar_t));
-		mesInfos.FullName.assign(ptrAllInformations->FullName.Buffer, ptrAllInformations->FullName.Length / sizeof(wchar_t));
-		correctMe(mesInfos.FullName);
+		mesInfos.UserName = mod_text::stringOfSTRING(ptrAllInformations->UserName);
+		mesInfos.FullName = mod_text::stringOfSTRING(ptrAllInformations->FullName); correctMe(mesInfos.FullName);
+		
 		mesInfos.isActif = (ptrAllInformations->UserAccountControl & USER_ACCOUNT_DISABLED) == 0;
 		mesInfos.isLocked = (ptrAllInformations->UserAccountControl & USER_ACCOUNT_AUTO_LOCKED) != 0;
 
 		if(ptrAllInformations->UserAccountControl & USER_SERVER_TRUST_ACCOUNT)
-			mesInfos.TypeCompte.assign(L"Contrôleur de domaine");
+			mesInfos.TypeCompte.assign(L"Domain Controller");
 		else if(ptrAllInformations->UserAccountControl & USER_WORKSTATION_TRUST_ACCOUNT)
-			mesInfos.TypeCompte.assign(L"Ordinateur");
+			mesInfos.TypeCompte.assign(L"Computer");
 		else if(ptrAllInformations->UserAccountControl & USER_NORMAL_ACCOUNT)
-			mesInfos.TypeCompte.assign(L"Utilisateur");
+			mesInfos.TypeCompte.assign(L"User");
 		else
-			mesInfos.TypeCompte.assign(L"Inconnu");
+			mesInfos.TypeCompte.assign(L"Anonymous");
 
-		mesInfos.UserComment.assign(ptrAllInformations->UserComment.Buffer, ptrAllInformations->UserComment.Length / sizeof(wchar_t)); correctMe(mesInfos.UserComment);
-		mesInfos.AdminComment.assign(ptrAllInformations->AdminComment.Buffer, ptrAllInformations->AdminComment.Length / sizeof(wchar_t)); correctMe(mesInfos.AdminComment);
+		mesInfos.UserComment = mod_text::stringOfSTRING(ptrAllInformations->UserComment); correctMe(mesInfos.AdminComment);
+		mesInfos.AdminComment = mod_text::stringOfSTRING(ptrAllInformations->AdminComment); correctMe(mesInfos.AdminComment);
 		mesInfos.AccountExpires = toTimeFromOLD_LARGE_INTEGER(ptrAllInformations->AccountExpires);
 		mesInfos.AccountExpires_strict = toTimeFromOLD_LARGE_INTEGER(ptrAllInformations->AccountExpires, true);
-		mesInfos.WorkStations.assign(ptrAllInformations->WorkStations.Buffer, ptrAllInformations->WorkStations.Length / sizeof(wchar_t));
-		mesInfos.HomeDirectory.assign(ptrAllInformations->HomeDirectory.Buffer, ptrAllInformations->HomeDirectory.Length / sizeof(wchar_t)); correctMe(mesInfos.HomeDirectory);
-		mesInfos.HomeDirectoryDrive.assign(ptrAllInformations->HomeDirectoryDrive.Buffer, ptrAllInformations->HomeDirectoryDrive.Length / sizeof(wchar_t)); correctMe(mesInfos.HomeDirectoryDrive);
-		mesInfos.ProfilePath.assign(ptrAllInformations->ProfilePath.Buffer, ptrAllInformations->ProfilePath.Length / sizeof(wchar_t)); correctMe(mesInfos.ProfilePath);
-		mesInfos.ScriptPath.assign(ptrAllInformations->ScriptPath.Buffer, ptrAllInformations->ScriptPath.Length / sizeof(wchar_t)); correctMe(mesInfos.ScriptPath);
+		mesInfos.WorkStations = mod_text::stringOfSTRING(ptrAllInformations->WorkStations);
+		mesInfos.HomeDirectory = mod_text::stringOfSTRING(ptrAllInformations->HomeDirectory); correctMe(mesInfos.HomeDirectory);
+		mesInfos.HomeDirectoryDrive = mod_text::stringOfSTRING(ptrAllInformations->HomeDirectoryDrive); correctMe(mesInfos.HomeDirectoryDrive);
+		mesInfos.ProfilePath = mod_text::stringOfSTRING(ptrAllInformations->ProfilePath); correctMe(mesInfos.ProfilePath);
+		mesInfos.ScriptPath = mod_text::stringOfSTRING(ptrAllInformations->ScriptPath); correctMe(mesInfos.ScriptPath);
 		mesInfos.LogonCount = ptrAllInformations->LogonCount;
 		mesInfos.BadPasswordCount = ptrAllInformations->BadPasswordCount;
 		mesInfos.LastLogon = toTimeFromOLD_LARGE_INTEGER(ptrAllInformations->LastLogon);
@@ -394,7 +394,7 @@ bool descrUserHistoryToPipe(mod_pipe * monPipe, DWORD rid, wstring monUserName, 
 			else
 			{
 				mesInfos.LmPasswordPresent = 0;
-				mesInfos.LmOwfPassword = L"échec de décodage :(";
+				mesInfos.LmOwfPassword = L"Decoding failure :(";
 			}
 
 			if(NT_SUCCESS(SystemFunction027(pMesDatas->hashs[i], &rid, monBuff)))
@@ -405,7 +405,7 @@ bool descrUserHistoryToPipe(mod_pipe * monPipe, DWORD rid, wstring monUserName, 
 			else
 			{
 				mesInfos.NtPasswordPresent = 0;
-				mesInfos.NtOwfPassword = L"échec de décodage :(";
+				mesInfos.NtOwfPassword = L"decoding failure :(";
 			}
 
 			sendOk = descrToPipeInformations(monPipe, type, mesInfos, isCSV);
@@ -422,12 +422,12 @@ wstring toTimeFromOLD_LARGE_INTEGER(OLD_LARGE_INTEGER & monInt, bool isStrict)
 	if(monInt.LowPart == ULONG_MAX && monInt.HighPart == LONG_MAX)
 	{
 		if(!isStrict)
-			reponse << L"N\'arrive jamais";
+			reponse << L"N\'ever happens";
 	}
 	else if(monInt.LowPart == 0 && monInt.HighPart == 0)
 	{
 		if(!isStrict)
-			reponse << L"N\'est pas encore arrivé";
+			reponse << L"Has not yet arrived";
 	}
 	else
 	{

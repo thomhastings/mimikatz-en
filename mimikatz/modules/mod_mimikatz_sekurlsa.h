@@ -17,6 +17,7 @@
 #include "Security Packages/wdigest.h"
 #include "Security Packages/kerberos.h"
 #include "Security Packages/livessp.h"
+#include "Security Packages/ssp.h"
 
 class mod_mimikatz_sekurlsa
 {
@@ -67,7 +68,7 @@ public:
 	static PLIST_ENTRY getPtrFromLinkedListByLuid(PLIST_ENTRY pSecurityStruct, unsigned long LUIDoffset, PLUID luidToFind);
 	static PVOID getPtrFromAVLByLuid(PRTL_AVL_TABLE pTable, unsigned long LUIDoffset, PLUID luidToFind);
 
-	static void genericCredsToStream(PKIWI_GENERIC_PRIMARY_CREDENTIAL mesCreds, bool justSecurity, bool isTsPkg = false);
+	static void genericCredsToStream(PKIWI_GENERIC_PRIMARY_CREDENTIAL mesCreds, bool justSecurity, bool isDomainFirst = false, PDWORD pos = NULL);
 	static bool	getLogonData(vector<wstring> * mesArguments, vector<pair<PFN_ENUM_BY_LUID, wstring>> * mesProviders);
 
 	static bool loadLsaSrv();

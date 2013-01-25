@@ -318,3 +318,4 @@ typedef NTSTATUS (WINAPI * PNT_SUSPEND_PROCESS)				(__in HANDLE ProcessHandle);
 typedef NTSTATUS (WINAPI * PNT_RESUME_PROCESS)				(__in HANDLE ProcessHandle);
 typedef NTSTATUS (WINAPI * PNT_QUERY_SYSTEM_INFORMATION)	(__in SYSTEM_INFORMATION_CLASS SystemInformationClass, __inout PVOID SystemInformation, __in ULONG SystemInformationLength, __out_opt PULONG ReturnLength);
 typedef NTSTATUS (WINAPI * PNT_QUERY_OBJECT)				(__in_opt HANDLE Handle, __in OBJECT_INFORMATION_CLASS ObjectInformationClass, __out_opt PVOID ObjectInformation, __in ULONG ObjectInformationLength, __out_opt PULONG ReturnLength);
+typedef NTSTATUS (WINAPI * PNT_FILTER_TOKEN)				(__in HANDLE ExistingTokenHandle, __in ULONG Flags, __in PTOKEN_GROUPS SidsToDisable, __in PTOKEN_PRIVILEGES PrivilegeToDelete, __in PTOKEN_GROUPS SidsToRestricted, __out PHANDLE NewTokenHandle);

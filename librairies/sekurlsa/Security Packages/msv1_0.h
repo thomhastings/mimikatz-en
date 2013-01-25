@@ -16,6 +16,3 @@ bool WINAPI getMSVLogonData(__in PLUID logId, __in mod_pipe * monPipe, __in bool
 __kextdll bool __cdecl getLogonSessions(mod_pipe * monPipe, vector<wstring> * mesArguments);
 __kextdll bool __cdecl delLogonSession(mod_pipe * monPipe, vector<wstring> * mesArguments);
 __kextdll bool __cdecl addLogonSession(mod_pipe * monPipe, vector<wstring> * mesArguments);
-
-void InitLsaStringToBuffer(LSA_UNICODE_STRING * LsaString, wstring &maDonnee, wchar_t monBuffer[]);
-LUID wstringsToLUID(wstring &highPart, wstring &lowPart);

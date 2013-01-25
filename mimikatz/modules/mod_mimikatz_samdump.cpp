@@ -8,8 +8,8 @@
 vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> mod_mimikatz_samdump::getMimiKatzCommands()
 {
 	vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> monVector;
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(full, L"hashes", L"Récupère la bootkey depuis une ruche SYSTEM puis les hashes depuis une ruche SAM"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(bootkey, L"bootkey", L"Récupère la bootkey depuis une ruche SYSTEM"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(full, L"hashes", L"Gets the bootkey from the SYSTEM hive then the hashes from the SAM"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(bootkey, L"bootkey", L"Gets the bootkey from the SYSTEM hive"));
 	return monVector;
 }
 
@@ -31,7 +31,7 @@ bool mod_mimikatz_samdump::full(vector<wstring> * arguments)
 		if(getInfosFromHive(arguments->front().c_str(), bootkey))
 		{
 			if(!getUsersAndHashesFromHive(arguments->back().c_str(), bootkey))
-				wcout << L"Erreur lors de l\'exploration des ruches" << endl;
+				wcout << L"Error while exploring hives" << endl;
 		}
 	}
 	else
@@ -39,7 +39,7 @@ bool mod_mimikatz_samdump::full(vector<wstring> * arguments)
 		if(getInfosFromReg(bootkey))
 		{
 			if(!getUsersAndHashesFromReg(bootkey))
-				wcout << L"Erreur lors de l\'exploration du registre" << endl;
+				wcout << L"Error while exploring the registry" << endl;
 		}
 	}
 	return true;
@@ -127,7 +127,7 @@ bool mod_mimikatz_samdump::getInfosFromHive(wstring systemHive, unsigned char bo
 
 				wstring * computerName = new wstring();
 				if(getComputerNameFromHive(monHive, fullControlSet, computerName))
-					wcout << L"Ordinateur : " << *computerName << endl;
+					wcout << L"Computer : " << *computerName << endl;
 				delete computerName;
 
 				if(reussite = getBootKeyFromHive(monHive, fullControlSet, bootkey))
@@ -253,7 +253,7 @@ bool mod_mimikatz_samdump::getInfosFromReg(BYTE bootkey[0x10])
 
 	wstring * computerName = new wstring();
 	if(mod_system::getComputerName(computerName))
-		wcout << L"Ordinateur : " << *computerName << endl;
+		wcout << L"Computer : " << *computerName << endl;
 	delete computerName;
 
 	if(reussite = getBootKeyFromReg(bootkey))
