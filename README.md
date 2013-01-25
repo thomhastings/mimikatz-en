@@ -2,11 +2,11 @@ mimikatz-en
 ===========
 
 English translation of Gentil Kiwi's [Mimikatz](http://blog.gentilkiwi.com/mimikatz)
+
 mimikatz
 ========
 
-
-This archive contains the binaries for x86 (Win32) and x64. Extracts of different source codes are available: http://blog.gentilkiwi.com/mimikatz
+This repository contains the source code. Extracts of different source codes are available: http://blog.gentilkiwi.com/mimikatz
 This utility can be used only for study, pentests and other legal actions in accordance with the license specified below.
 
 More generally, thank you for respecting the philosophy with which this tool was created, ie not allowing its use for malicious purposes.
@@ -18,7 +18,6 @@ _____________________________________________________
 Benjamin DELPY `gentilkiwi`
 http://blog.gentilkiwi.com/mimikatz
 benjamin@gentilkiwi.com
-
 
 anti-gpo standalone
 ===================
