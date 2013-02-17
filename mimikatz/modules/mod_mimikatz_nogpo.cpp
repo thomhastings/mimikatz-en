@@ -1,7 +1,7 @@
 /*	Benjamin DELPY `gentilkiwi`
 	http://blog.gentilkiwi.com
 	benjamin@gentilkiwi.com
-	Licence : http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
+	Licence : http://creativecommons.org/licenses/by-nc-sa/3.0/
 */
 #include "mod_mimikatz_nogpo.h"
 
@@ -23,7 +23,7 @@ bool mod_mimikatz_nogpo::regedit(vector<wstring> * arguments)
 
 bool mod_mimikatz_nogpo::cmd(vector<wstring> * arguments)
 {
-	wcout << L"Command prompt : " << (disableSimple(L"cmd.exe", L"DisableCMD", L"KiwiAndCMD") ? "OK" : "KO") << endl;
+	wcout << L"Command Prompt : " << (disableSimple(L"cmd.exe", L"DisableCMD", L"KiwiAndCMD") ? "OK" : "KO") << endl;
 	return true;
 }
 

@@ -1,7 +1,7 @@
 /*	Benjamin DELPY `gentilkiwi`
 	http://blog.gentilkiwi.com
 	benjamin@gentilkiwi.com
-	Licence : http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
+	Licence : http://creativecommons.org/licenses/by-nc-sa/3.0/
 */
 #include "mimikatz.h"
 
@@ -14,20 +14,20 @@ bool mimikatz::initLocalModules()
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"",			L"Standard", mod_mimikatz_standard::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"crypto",		L"Cryptography and Certificates", mod_mimikatz_crypto::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"hash",		L"Hash", mod_mimikatz_hash::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"system",		L"Management system", mod_mimikatz_system::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"process",		L"Handling process", mod_mimikatz_process::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"thread",		L"Handling threads", mod_mimikatz_thread::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"service",		L"Handling services", mod_mimikatz_service::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"system",		L"Management System", mod_mimikatz_system::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"process",		L"Handling Process", mod_mimikatz_process::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"thread",		L"Handling Threads", mod_mimikatz_thread::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"service",		L"Handling Services", mod_mimikatz_service::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"privilege",	L"Privilege Manipulation", mod_mimikatz_privilege::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"handle",		L"Handle Manipulation", mod_mimikatz_handle::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"impersonate",	L"Access Token Manipulation", mod_mimikatz_impersonate::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"winmine",		L"Minesweeper Handles", mod_mimikatz_winmine::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"minesweeper",	L"Manipulation of minesweeper 7", mod_mimikatz_minesweeper::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"nogpo",		L"Anti-gpo and various patches", mod_mimikatz_nogpo::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"minesweeper",	L"Manipulation of Minesweeper 7", mod_mimikatz_minesweeper::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"nogpo",		L"Anti-GPO and Various Patches", mod_mimikatz_nogpo::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"samdump",		L"SAM Dump", mod_mimikatz_samdump::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"inject",		L"Injector libraries", mod_mimikatz_inject::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"inject",		L"Injector Libraries", mod_mimikatz_inject::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"ts",			L"Terminal Server", mod_mimikatz_terminalserver::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"misc",		L"Miscellaneous functions that have not yet enough body to have their own Module", mod_mimikatz_divers::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"misc",		L"Miscellaneous functions without their own Module", mod_mimikatz_divers::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"sekurlsa",	L"Dump current sessions LSASS", mod_mimikatz_sekurlsa::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"efs",			L"EFS Manipulation", mod_mimikatz_efs::getMimiKatzCommands()));
 	return true;
@@ -187,30 +187,15 @@ bool mimikatz::doCommandeKernel(std::wstring &commande)
 		if(openKernel())
 		{
 			DWORD dwReturn;
-			/*
-			wcout << L"DEBUG WriteFile " << endl <<
-				L"\tToWrite : " << (commande.size() + 1) * sizeof(wchar_t) << endl;
-			*/
 			if(WriteFile(Kmimikatz, commande.c_str(), (commande.size() + 1) * sizeof(wchar_t), &dwReturn, NULL))
 			{
-				/*wcout << L"\tWriten  : " << dwReturn << endl << endl;*/
-
 				DWORD dwBuff = 0x40000;
 				DWORD dwRead = 0;
 				BYTE * buffer = new BYTE[dwBuff];
 				RtlZeroMemory(buffer, dwBuff);
-
-				/*wcout << L"DEBUG ReadFile " << endl <<
-					L"\tBuffSize : " << dwBuff << endl;*/
-
 				if(ReadFile(Kmimikatz, buffer, dwBuff, &dwRead, NULL))
 				{
-					/*wcout <<
-						L"\tReaded   : " << dwRead << endl <<
-						endl;
-					*/
-					wcout /*<< L"BUFF : " << endl*/
-						<< reinterpret_cast<wchar_t *>(buffer) << endl;
+					wcout << reinterpret_cast<wchar_t *>(buffer) << endl;
 				}
 				else wcout << L"ReadFile : " << mod_system::getWinError() << endl;
 

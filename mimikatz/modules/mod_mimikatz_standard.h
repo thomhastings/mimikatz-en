@@ -1,7 +1,7 @@
 /*	Benjamin DELPY `gentilkiwi`
 	http://blog.gentilkiwi.com
 	benjamin@gentilkiwi.com
-	Licence : http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
+	Licence : http://creativecommons.org/licenses/by-nc-sa/3.0/
 */
 #pragma once
 #include "globdefs.h"
@@ -16,7 +16,7 @@ public:
 	static bool clearScreen(vector<wstring> * arguments);
 	static bool exit(vector<wstring> * arguments);
 	static bool cite(vector<wstring> * arguments);
-	static bool reponse(vector<wstring> * arguments);
+	static bool answer(vector<wstring> * arguments);
 	static bool version(vector<wstring> * arguments);
 	static bool sleep(vector<wstring> * arguments);
 	static bool test(vector<wstring> * arguments);

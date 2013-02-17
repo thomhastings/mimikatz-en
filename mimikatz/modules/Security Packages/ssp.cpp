@@ -1,8 +1,8 @@
 /*	Benjamin DELPY `gentilkiwi`
 	http://blog.gentilkiwi.com
 	benjamin@gentilkiwi.com
-	Licence    : http://creativecommons.org/licenses/by-nc-sa/3.0/fr/
-	Ce fichier : http://creativecommons.org/licenses/by/3.0/fr/
+	Licence    : http://creativecommons.org/licenses/by-nc-sa/3.0/
+	This file  : http://creativecommons.org/licenses/by/3.0/
 */
 #include "ssp.h"
 mod_process::PKIWI_VERY_BASIC_MODULEENTRY mod_mimikatz_sekurlsa_ssp::pModMSV = NULL;
