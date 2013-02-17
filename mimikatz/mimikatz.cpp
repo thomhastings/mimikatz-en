@@ -27,7 +27,7 @@ bool mimikatz::initLocalModules()
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"samdump",		L"SAM Dump", mod_mimikatz_samdump::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"inject",		L"Injector Libraries", mod_mimikatz_inject::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"ts",			L"Terminal Server", mod_mimikatz_terminalserver::getMimiKatzCommands()));
-	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"misc",		L"Miscellaneous functions without their own Module", mod_mimikatz_divers::getMimiKatzCommands()));
+	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"misc",		L"Miscellaneous Functions without their own Module", mod_mimikatz_divers::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"sekurlsa",	L"Dump current sessions LSASS", mod_mimikatz_sekurlsa::getMimiKatzCommands()));
 	mesModules.push_back(KIWI_MIMIKATZ_LOCAL_MODULE(L"efs",			L"EFS Manipulation", mod_mimikatz_efs::getMimiKatzCommands()));
 	return true;
