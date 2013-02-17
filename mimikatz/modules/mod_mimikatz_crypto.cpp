@@ -8,14 +8,14 @@
 vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> mod_mimikatz_crypto::getMimiKatzCommands()
 {
 	vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> monVector;
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(listProviders,		L"listProviders",		L"List providers installed)"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(listProviders,		L"listProviders",		L"List providers installed"));
 	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(listStores,			L"listStores",			L"List system stores"));
 	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(listCertificates,	L"listCertificates",	L"List certificates"));
 	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(listKeys,			L"listKeys",			L"List key containers"));
 	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(exportCertificates,	L"exportCertificates",	L"Export certificates"));
 	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(exportKeys,			L"exportKeys",			L"Export Keys"));
 	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(patchcng,			L"patchcng",			L"[experimental] Patch Key Manager for key export non-exportable"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(patchcapi,			L"patchcapi",			L"experimental] Patch for the current CryptoAPI key export non-exportable"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(patchcapi,			L"patchcapi",			L"[experimental] Patch for the current CryptoAPI key export non-exportable"));
 	return monVector;
 }
 
