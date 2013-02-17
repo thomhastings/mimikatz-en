@@ -14,6 +14,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kappfree", "kappfree\kappfree.vcxproj", "{E7A85049-E31E-4575-B6A0-E6F1EAA9EEB0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7999D050-6332-45F7-A343-C343902B1453}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Headers", "Headers", "{24371643-CEFE-4590-BB29-6141CB5E25D1}"
 	ProjectSection(SolutionItems) = preProject
