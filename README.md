@@ -1,3 +1,9 @@
+windows credential editor
+=========================
+
+Wondows Credential Editor (WCE) does the same thing as mimikatz, basically.  
+There's some kind of difference about what runs in memory and what doesn't.  
+
 mimikatz-en
 ===========
 
